@@ -4,28 +4,29 @@ import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '@/shared/lib/cn';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-sans font-semibold text-ink outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
-        outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+        /** Amber desktop CTA with the hard bottom shadow. */
+        primary:
+          'rounded-cta bg-amber px-[18px] py-[10px] text-[15px] shadow-cta hover:bg-amber-hover',
+        /** White with the 1.5px ink border and cream bottom shadow. */
+        secondary:
+          'rounded-cta border-[1.5px] border-ink bg-white px-[18px] py-[10px] text-[15px] shadow-[0_3px_0_#C9BFAE] hover:bg-paper-3',
+        /** Transparent menu-bar item. */
+        menu: 'rounded-md px-2.5 py-2 text-sm font-medium hover:bg-ink/8',
+        /** 30×30 window title-bar icon button. */
+        window: 'size-[30px] rounded-md text-muted-2 hover:bg-ink/8 hover:text-ink',
       },
       size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        icon: 'size-9',
+        default: 'min-h-11',
+        sm: 'min-h-9 px-3.5 py-1.5 text-sm',
+        icon: '',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'primary',
       size: 'default',
     },
   },

@@ -20,13 +20,33 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
   });
 
+  it('applies the primary variant by default', () => {
+    render(<Button>Send</Button>);
+    expect(screen.getByRole('button', { name: /send/i })).toHaveClass('bg-amber');
+  });
+
   it('applies variant classes', () => {
-    render(<Button variant="destructive">Delete</Button>);
-    expect(screen.getByRole('button', { name: /delete/i })).toHaveClass('bg-destructive');
+    render(<Button variant="secondary">Download</Button>);
+    expect(screen.getByRole('button', { name: /download/i })).toHaveClass('bg-white');
+    render(<Button variant="menu">Projects</Button>);
+    expect(screen.getByRole('button', { name: /projects/i })).toHaveClass('text-sm');
+    render(<Button variant="window" aria-label="Close window" />);
+    expect(screen.getByRole('button', { name: 'Close window' })).toHaveClass('size-[30px]');
   });
 
   it('applies size classes', () => {
     render(<Button size="sm">Small</Button>);
-    expect(screen.getByRole('button', { name: /small/i })).toHaveClass('h-8');
+    expect(screen.getByRole('button', { name: /small/i })).toHaveClass('min-h-9');
+  });
+
+  it('renders as an anchor with asChild', () => {
+    render(
+      <Button asChild>
+        <a href="/projects">See my projects</a>
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: /see my projects/i });
+    expect(link).toHaveAttribute('href', '/projects');
+    expect(link).toHaveClass('bg-amber');
   });
 });
