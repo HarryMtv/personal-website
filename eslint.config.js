@@ -5,7 +5,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'src/routeTree.gen.ts', 'skills'] },
+  { ignores: ['dist', 'src/app/routeTree.gen.ts', 'skills'] },
 
   // Base linting for every JS/TS file (no type information required).
   js.configs.recommended,
@@ -51,16 +51,16 @@ export default tseslint.config(
     },
   },
 
-  // Routes export `Route` and shadcn components export variants — neither is a
-  // Fast Refresh violation.
+  // Routes export `Route` and shared ui components export variants — neither
+  // is a Fast Refresh violation.
   {
-    files: ['src/routes/**/*.{ts,tsx}'],
+    files: ['src/app/routes/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },
   },
   {
-    files: ['src/components/ui/**/*.{ts,tsx}'],
+    files: ['src/shared/ui/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

@@ -8,7 +8,12 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [
     // Router plugin FIRST so routeTree.gen.ts is available to the rest of the build.
-    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+      routesDirectory: './src/app/routes',
+      generatedRouteTree: './src/app/routeTree.gen.ts',
+    }),
     react(),
     tailwindcss(),
   ],
@@ -25,11 +30,11 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/shared/lib/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
       provider: 'v8',
-      exclude: ['src/routeTree.gen.ts'],
+      exclude: ['src/app/routeTree.gen.ts'],
     },
   },
 });

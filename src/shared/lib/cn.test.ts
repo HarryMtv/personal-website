@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { cn } from './utils';
+import { cn } from './cn';
 
-describe('utils', () => {
+describe('cn', () => {
   describe('cn', () => {
     it('merges standard classes', () => {
       expect(cn('class1', 'class2')).toBe('class1 class2');
