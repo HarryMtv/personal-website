@@ -36,6 +36,12 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
 
+  // Root-level CommonJS config scripts (dependency-cruiser, …) run in Node.
+  {
+    files: ['*.cjs'],
+    languageOptions: { globals: globals.node },
+  },
+
   // React rules apply to app code only.
   {
     files: ['src/**/*.{ts,tsx}'],
