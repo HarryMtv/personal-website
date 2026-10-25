@@ -15,6 +15,8 @@
     "typecheck": "tsr generate && tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:boundaries": "depcruise src --config .dependency-cruiser.cjs",
+    "deps:graph": "mkdir -p docs/architecture && depcruise src --config .dependency-cruiser.cjs --output-type mermaid > docs/architecture/dependency-graph.mmd",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -23,7 +25,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "check": "pnpm typecheck && pnpm lint && pnpm lint:boundaries && pnpm test",
     "ui:add": "shadcn add"
   },
   "dependencies": {
