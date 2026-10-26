@@ -1,0 +1,68 @@
+---
+title: 'PM Telegram Hub'
+kind: 'side'
+kindLabel: 'Side project'
+tags: ['typescript', 'telegram', 'ai']
+summary: 'Telegram bot + mini app that brings ClickUp, Wrike and Jira tasks into your chats through one adapters layer.'
+lead: 'Your task tracker, inside Telegram. One bot and mini app for ClickUp, Wrike and Jira — subscribe to a task, read it, comment on it, without opening another tab.'
+stack: ['TypeScript', 'Fastify', 'Supabase', 'Docker', 'shadcn']
+stackShort: 'TS · Fastify · Supabase'
+role: 'Solo — design, code, deploy'
+# TODO(content): confirm the project status.
+status: '[Live / beta]'
+facts:
+  - label: 'Role'
+    value: 'Solo: spec, code, deploy'
+  - label: 'Built in'
+    value: '5 days, AI-assisted'
+  - label: 'Stack'
+    value: 'TypeScript, Fastify, Supabase'
+  - label: 'Hosted on'
+    value: 'Docker on my VPS (Coolify)'
+links:
+  - label: 'Try @pm_assist_tool_bot'
+    url: 'https://t.me/pm_assist_tool_bot'
+  - label: 'Source on GitHub'
+    url: 'https://github.com/HarryMtv/pm-telegram-hub'
+screenshotCaption: '[Screenshots: chat notification + mini app task view, side by side]'
+order: 1
+hasCaseStudy: true
+---
+
+<Columns>
+
+## Why
+
+ClickUp users had been asking for a Telegram integration for years, and the feature request just sat there. Teams already live in Telegram — so I built the bridge myself, and made it work for more than one tracker.
+
+## What it does
+
+- Subscribe to individual tasks and get updates in chat
+- Read task descriptions without leaving Telegram
+- Comment, reply and edit from the bot
+- Your own changes don't echo back to you
+
+</Columns>
+
+## How it's built
+
+<FlowDiagram
+  nodes={[
+    { title: 'Telegram', caption: 'Bot chat + mini app' },
+    { title: 'Bot service', caption: 'Fastify, TypeScript', tone: 'highlight' },
+    { title: 'Adapters layer', caption: 'One interface per tracker', tone: 'accent' },
+    { title: 'ClickUp · Wrike · Jira', caption: 'The trackers', tone: 'plain' },
+  ]}
+  targets={['ClickUp', 'Wrike', 'Jira']}
+  footer={[
+    'Supabase — subscriptions & users',
+    'Docker + Coolify on VPS',
+    'shadcn + Tailwind mini app',
+  ]}
+/>
+
+## What I learned
+
+[Two or three honest takeaways — e.g. what the adapters abstraction got right, where the AI workflow needed a human, what you'd do differently.]
+
+The full story is in the build log: [Building a Telegram PM hub in five days with AI](/writing/telegram-pm-hub-in-5-days).

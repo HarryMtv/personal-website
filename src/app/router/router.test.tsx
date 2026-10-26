@@ -1,6 +1,8 @@
 import { act, render, screen, within } from '@testing-library/react';
 import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { describe, expect, it } from 'vitest';
+import { getProjectBySlug } from '@/entities/project';
+import { getPostBySlug } from '@/entities/post';
 import { ErrorPage } from '@/pages/error';
 import { NotFoundPage } from '@/pages/not-found';
 import { routeTree } from '../routeTree.gen';
@@ -49,5 +51,11 @@ describe('router integration', () => {
       'aria-current',
       'page',
     );
+  });
+
+  it('keeps cross-entity content references intact', () => {
+    // Entities cannot import each other, so the cross-check lives here.
+    const post = getPostBySlug('telegram-pm-hub-in-5-days');
+    expect(getProjectBySlug(post?.relatedProject ?? '')).toBeDefined();
   });
 });
