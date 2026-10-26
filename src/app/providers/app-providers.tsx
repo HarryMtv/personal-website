@@ -1,6 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { MotionConfig } from 'motion/react';
+import { LazyMotion, MotionConfig, domMax } from 'motion/react';
 import type { PropsWithChildren } from 'react';
 import { queryClient } from '@/shared/lib/query-client';
 
@@ -8,8 +8,12 @@ import { queryClient } from '@/shared/lib/query-client';
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* `reducedMotion="user"` disables transforms/animations per OS setting. */}
-      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      {/* `reducedMotion="user"` disables transforms/animations per OS setting;
+          `strict` + `domMax` keeps Motion in one lazy bundle and enforces
+          the light `m.*` components (drag and layout included). */}
+      <LazyMotion features={domMax} strict>
+        <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      </LazyMotion>
       {/* No-op in production builds. */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

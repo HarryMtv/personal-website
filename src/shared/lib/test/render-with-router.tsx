@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import {
   RouterProvider,
   createMemoryHistory,
@@ -28,19 +28,36 @@ export function createTestQueryClient() {
  * Renders `ui` inside a minimal throwaway router over a memory history, so
  * components using `Link`/`useNavigate` can be tested without the real app
  * route tree. The catch-all route renders `ui` at any path.
+ *
+ * Await it: RouterProvider commits its first render asynchronously (it runs
+ * inside a React transition), so the helper flushes once before returning.
  */
-export function renderWithRouter(ui: ReactNode, { path = '/' }: RenderWithRouterOptions = {}) {
+export async function renderWithRouter(
+  ui: ReactNode,
+  { path = '/' }: RenderWithRouterOptions = {},
+) {
   const rootRoute = createRootRoute();
-  const testRoute = createRoute({
+  const renderUi = () => <>{ui}</>;
+  const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: '*',
-    component: () => <>{ui}</>,
+    path: '/',
+    component: renderUi,
+  });
+  // Splat route so components render at any nested path (e.g. /projects).
+  const anyRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/$',
+    component: renderUi,
   });
   const router = createRouter({
-    routeTree: rootRoute.addChildren([testRoute]),
+    routeTree: rootRoute.addChildren([indexRoute, anyRoute]),
     history: createMemoryHistory({ initialEntries: [path] }),
   });
 
   const rendered = render(<RouterProvider router={router} />);
+  // Flush the router's initial transition (see the doc comment above).
+  await act(async () => {
+    await Promise.resolve();
+  });
   return { ...rendered, router };
 }

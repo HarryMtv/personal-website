@@ -1,5 +1,6 @@
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router';
+import { DesktopShell } from '@/widgets/desktop-shell';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -21,7 +22,9 @@ function RootLayout() {
   return (
     <>
       <HeadContent />
-      <Outlet />
+      <DesktopShell>
+        <Outlet />
+      </DesktopShell>
       {/* No-op in production builds. */}
       <TanStackRouterDevtools />
     </>

@@ -1,4 +1,5 @@
 import { createRouter } from '@tanstack/react-router';
+import { WindowSkeleton } from '@/shared/ui/window';
 import { routeTree } from '../routeTree.gen';
 
 /**
@@ -11,6 +12,8 @@ export const router = createRouter({
   defaultPreload: 'intent',
   scrollRestoration: true,
   defaultViewTransition: true,
+  defaultPendingMs: 150,
+  defaultPendingComponent: WindowSkeleton,
 });
 
 // Register the router for end-to-end type safety.
