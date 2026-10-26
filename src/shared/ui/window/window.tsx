@@ -1,12 +1,6 @@
 import { Link, useNavigate, type LinkProps } from '@tanstack/react-router';
 import { FileIcon, X } from 'lucide-react';
-import {
-  createContext,
-  useContext,
-  useId,
-  type ReactNode,
-  type RefObject,
-} from 'react';
+import { createContext, useContext, useId, type ReactNode, type RefObject } from 'react';
 import { m, useDragControls, useReducedMotion } from 'motion/react';
 import { cn } from '@/shared/lib/cn';
 import { useEscapeToClose } from '@/shared/lib/use-escape-to-close';
@@ -89,7 +83,7 @@ export function Window({
       dragConstraints={bounds ?? undefined}
       dragMomentum={false}
       className={cn(
-        'window mx-auto flex w-full flex-col overflow-hidden rounded-window border border-ink/25 shadow-window',
+        'window rounded-window border-ink/25 shadow-window mx-auto flex w-full flex-col overflow-hidden border',
         'max-[899px]:rounded-b-none max-[899px]:shadow-[0_-8px_30px_rgb(40_12_0/0.35)]',
         MAX_WIDTH[maxWidth],
       )}
@@ -98,10 +92,15 @@ export function Window({
         onPointerDown={(event) => {
           if (canDrag) dragControls.start(event);
         }}
-        className="flex touch-none items-center gap-2.5 border-b border-ink/15 bg-paper-2 px-4 py-2"
+        className="border-ink/15 bg-paper-2 flex touch-none items-center gap-2.5 border-b px-4 py-2"
       >
-        <FileIcon size={16} strokeWidth={1.8} className="shrink-0 text-muted-2" aria-hidden="true" />
-        <span id={titleId} className="font-mono text-[13px] font-medium text-ink-2">
+        <FileIcon
+          size={16}
+          strokeWidth={1.8}
+          className="text-muted-2 shrink-0"
+          aria-hidden="true"
+        />
+        <span id={titleId} className="text-ink-2 font-mono text-[13px] font-medium">
           {hidePrefix ? null : <span className="text-muted">~/igor/</span>}
           {path.map((segment, index) => (
             <span key={segment.label}>
@@ -117,7 +116,7 @@ export function Window({
           ))}
         </span>
         <div className="ml-auto flex items-center gap-2">
-          {meta ? <span className="font-mono text-xs text-muted">{meta}</span> : null}
+          {meta ? <span className="text-muted font-mono text-xs">{meta}</span> : null}
           {toolbar}
           <Button asChild variant="window" aria-label="Close window">
             <Link to={closeTo}>

@@ -12,7 +12,7 @@ export function Card({ className, elevated = false, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        'flex flex-col gap-3 rounded-card border border-ink/15 bg-card p-[22px]',
+        'rounded-card border-ink/15 bg-card flex flex-col gap-3 border p-[22px]',
         elevated && 'shadow-[0_10px_30px_rgb(30_27_24/0.08)]',
         className,
       )}

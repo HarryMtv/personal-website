@@ -15,10 +15,10 @@ export function MenuBar() {
   const clock = usePragueClock();
 
   return (
-    <header className="sticky top-0 z-[5] flex flex-wrap items-center gap-1 border-b border-ink/15 bg-paper/95 px-3.5 py-1.5 backdrop-blur-sm">
+    <header className="border-ink/15 bg-paper/95 sticky top-0 z-[5] flex flex-wrap items-center gap-1 border-b px-3.5 py-1.5 backdrop-blur-sm">
       <Link
         to="/"
-        className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-semibold text-ink hover:bg-ink/8"
+        className="text-ink hover:bg-ink/8 flex items-center gap-2 rounded-md px-2.5 py-2 text-sm font-semibold"
       >
         <ImMonogram />
         <span>Igor Martynov</span>
@@ -28,14 +28,14 @@ export function MenuBar() {
           <Link
             key={item.to}
             to={item.to}
-            className="rounded-md px-2.5 py-2 text-sm font-medium text-ink hover:bg-ink/8"
+            className="text-ink hover:bg-ink/8 rounded-md px-2.5 py-2 text-sm font-medium"
           >
             {item.label}
           </Link>
         ))}
       </nav>
       <div className="ml-auto flex items-center gap-3">
-        <span className="font-mono text-[13px] font-medium text-muted-2" aria-live="off">
+        <span className="text-muted-2 font-mono text-[13px] font-medium" aria-live="off">
           Praha · {clock}
         </span>
         <Button asChild size="sm" className="max-[640px]:hidden">

@@ -5,9 +5,6 @@ import { SectionLabel } from './section-label';
 describe('SectionLabel', () => {
   it('renders an uppercase mono label', () => {
     render(<SectionLabel>Open to</SectionLabel>);
-    expect(screen.getByRole('heading', { name: 'Open to' })).toHaveClass(
-      'font-mono',
-      'uppercase',
-    );
+    expect(screen.getByRole('heading', { name: 'Open to' })).toHaveClass('font-mono', 'uppercase');
   });
 });

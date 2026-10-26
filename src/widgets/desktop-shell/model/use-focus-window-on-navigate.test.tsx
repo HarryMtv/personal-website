@@ -21,9 +21,7 @@ function Probe() {
 }
 
 function resolve() {
-  listeners.forEach((listener) =>
-    listener({ toLocation: {}, fromLocation: {} }),
-  );
+  listeners.forEach((listener) => listener({ toLocation: {}, fromLocation: {} }));
 }
 
 describe('useFocusWindowOnNavigate', () => {

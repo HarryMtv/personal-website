@@ -1,6 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ProjectsPage } from '@/pages/projects';
+import { pageTitle } from '@/shared/config/site';
+
+const head = () => ({
+  meta: [
+    { title: pageTitle('projects/') },
+    { name: 'description', content: 'Side projects, work highlights and experiments.' },
+  ],
+});
 
 export const Route = createFileRoute('/projects/')({
+  head,
   component: ProjectsPage,
 });

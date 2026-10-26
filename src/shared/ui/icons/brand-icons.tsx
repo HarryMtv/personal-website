@@ -60,7 +60,7 @@ export function ImMonogram({ size = 26 }: { size?: number }) {
     <span
       aria-hidden="true"
       style={{ width: size, height: size }}
-      className="flex items-center justify-center rounded-[7px] bg-ink font-display text-[12px] font-extrabold tracking-[-0.02em] text-paper"
+      className="bg-ink font-display text-paper flex items-center justify-center rounded-[7px] text-[12px] font-extrabold tracking-[-0.02em]"
     >
       IM
     </span>

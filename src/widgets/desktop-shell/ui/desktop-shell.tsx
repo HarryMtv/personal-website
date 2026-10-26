@@ -16,7 +16,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
   useFocusWindowOnNavigate();
 
   return (
-    <div className="wallpaper flex min-h-screen flex-col bg-desk text-ink">
+    <div className="wallpaper bg-desk text-ink flex min-h-screen flex-col">
       <SkipLink />
       <MenuBar />
       <MobileIconGrid />

@@ -7,7 +7,7 @@ export function SectionLabel({ className, ...props }: HTMLAttributes<HTMLHeading
     <h2
       data-slot="section-label"
       className={cn(
-        'm-0 font-mono text-xs font-medium tracking-[0.06em] text-muted uppercase',
+        'text-muted m-0 font-mono text-xs font-medium tracking-[0.06em] uppercase',
         className,
       )}
       {...props}

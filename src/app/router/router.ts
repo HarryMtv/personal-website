@@ -1,4 +1,6 @@
 import { createRouter } from '@tanstack/react-router';
+import { ErrorPage } from '@/pages/error';
+import { NotFoundPage } from '@/pages/not-found';
 import { WindowSkeleton } from '@/shared/ui/window';
 import { routeTree } from '../routeTree.gen';
 
@@ -14,6 +16,8 @@ export const router = createRouter({
   defaultViewTransition: true,
   defaultPendingMs: 150,
   defaultPendingComponent: WindowSkeleton,
+  defaultNotFoundComponent: NotFoundPage,
+  defaultErrorComponent: ErrorPage,
 });
 
 // Register the router for end-to-end type safety.

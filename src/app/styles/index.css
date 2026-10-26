@@ -59,8 +59,7 @@
   --radius-cta: 9px;
 
   /* shadows */
-  --shadow-window:
-    0 2px 0 rgb(30 27 24 / 0.15), 0 24px 60px rgb(40 12 0 / 0.45);
+  --shadow-window: 0 2px 0 rgb(30 27 24 / 0.15), 0 24px 60px rgb(40 12 0 / 0.45);
   --shadow-tile: 0 2px 0 #6e2c13, 0 6px 14px rgb(40 12 0 / 0.35);
   --shadow-note: 0 10px 24px rgb(40 12 0 / 0.35);
   --shadow-cta: 0 3px 0 var(--color-amber-shadow);

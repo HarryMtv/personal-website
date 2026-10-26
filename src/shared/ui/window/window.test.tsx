@@ -17,7 +17,10 @@ describe('Window', () => {
 
   it('renders path segments as links when they have a target', async () => {
     await renderWithRouter(
-      <Window path={[{ label: 'projects/', to: '/projects' }, { label: 'README.md' }]} closeTo="/projects">
+      <Window
+        path={[{ label: 'projects/', to: '/projects' }, { label: 'README.md' }]}
+        closeTo="/projects"
+      >
         <p>content</p>
       </Window>,
     );

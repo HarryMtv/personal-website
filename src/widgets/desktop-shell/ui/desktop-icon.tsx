@@ -42,7 +42,7 @@ export function DesktopIcon({ icon, index, label, className }: DesktopIconProps)
       >
         <m.span
           variants={{ hover: { y: -2 }, tap: { scale: 0.96 } }}
-          className="flex size-[54px] items-center justify-center rounded-[14px] bg-paper text-ink shadow-tile"
+          className="bg-paper text-ink shadow-tile flex size-[54px] items-center justify-center rounded-[14px]"
         >
           <Icon size={28} strokeWidth={1.7} aria-hidden="true" />
         </m.span>

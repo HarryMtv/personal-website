@@ -15,11 +15,11 @@ export function Placeholder({ ratio = '16/10', caption, className, ...props }: P
       <div
         data-slot="placeholder"
         style={{ aspectRatio: ratio }}
-        className="flex w-full items-center justify-center rounded-card border-2 border-dashed border-ink/30 bg-white/60 font-mono text-xs text-muted"
+        className="rounded-card border-ink/30 text-muted flex w-full items-center justify-center border-2 border-dashed bg-white/60 font-mono text-xs"
       >
         screenshot
       </div>
-      {caption ? <p className="m-0 font-mono text-xs text-muted">{caption}</p> : null}
+      {caption ? <p className="text-muted m-0 font-mono text-xs">{caption}</p> : null}
     </div>
   );
 }
