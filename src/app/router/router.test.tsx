@@ -58,4 +58,27 @@ describe('router integration', () => {
     const post = getPostBySlug('telegram-pm-hub-in-5-days');
     expect(getProjectBySlug(post?.relatedProject ?? '')).toBeDefined();
   });
+
+  it('filters the explorer from the URL (?kind=work shows 1 row)', async () => {
+    await renderApp('/projects?kind=work');
+    const rows = document.querySelectorAll('a[data-selected]');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent('universal-tree');
+  });
+
+  it('shows 404.md for a project without a case study', async () => {
+    await renderApp('/projects/distill');
+    expect(screen.getByText(/this file doesn.t exist/i)).toBeInTheDocument();
+  });
+
+  it('renders the case study with its MDX body', async () => {
+    await renderApp('/projects/pm-telegram-hub');
+    expect(screen.getByRole('heading', { level: 1, name: /pm telegram hub/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /how it.s built/i })).toBeInTheDocument();
+    expect(screen.getByText('Adapters layer')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /all projects/i })).toHaveAttribute(
+      'href',
+      '/projects',
+    );
+  });
 });
