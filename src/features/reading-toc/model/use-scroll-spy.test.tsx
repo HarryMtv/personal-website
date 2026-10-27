@@ -61,13 +61,14 @@ describe('useScrollSpy', () => {
     const { getByTestId } = render(<Probe ids={['a', 'b']} />);
 
     const callback = MockIntersectionObserver.callbacks[0]!;
+    const observer = new MockIntersectionObserver(vi.fn());
     act(() => {
-      callback([entry('b', true)], undefined);
+      callback([entry('b', true)], observer);
     });
     expect(getByTestId('active')).toHaveTextContent('b');
 
     act(() => {
-      callback([entry('a', true), entry('b', false)], undefined);
+      callback([entry('a', true), entry('b', false)], observer);
     });
     expect(getByTestId('active')).toHaveTextContent('a');
     vi.unstubAllGlobals();
