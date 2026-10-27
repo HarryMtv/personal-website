@@ -60,7 +60,7 @@ describe('useScrollSpy', () => {
     MockIntersectionObserver.instances = [];
     const { getByTestId } = render(<Probe ids={['a', 'b']} />);
 
-    const callback = MockIntersectionObserver.callbacks[0]!;
+    const callback = MockIntersectionObserver.callbacks[0];
     const observer = new MockIntersectionObserver(vi.fn());
     act(() => {
       callback([entry('b', true)], observer);
