@@ -1,5 +1,6 @@
 import { getPosts, PostCard } from '@/entities/post';
 import { Window } from '@/shared/ui/window';
+import { StaggerItem, StaggerList } from '@/shared/ui/motion/stagger-list';
 
 /** The writing/ window: post cards or the empty state. */
 export function WritingPage() {
@@ -12,11 +13,13 @@ export function WritingPage() {
           Writing
         </h1>
         {posts.length > 0 ? (
-          <div className="flex flex-col gap-4">
+          <StaggerList className="flex flex-col gap-4">
             {posts.map((post) => (
-              <PostCard key={post.slug} post={post} />
+              <StaggerItem key={post.slug}>
+                <PostCard post={post} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerList>
         ) : (
           <p className="text-ink-2 m-0">Nothing published yet.</p>
         )}

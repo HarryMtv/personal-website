@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderWithRouter } from '@/shared/lib/test/render-with-router';
 import { Window } from './window';
 
@@ -83,5 +83,31 @@ describe('Window', () => {
     );
     // The default matchMedia stub matches nothing.
     expect(document.querySelector('[data-window]')).toHaveAttribute('data-draggable', 'false');
+  });
+
+  it('is not draggable under prefers-reduced-motion, even on a desk viewport', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+    try {
+      await renderWithRouter(
+        <Window path={[{ label: 'about.md' }]} closeTo="/desktop">
+          <p>content</p>
+        </Window>,
+      );
+      expect(document.querySelector('[data-window]')).toHaveAttribute('data-draggable', 'false');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { m } from 'motion/react';
 import { FileIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import type { Project } from '../model/project';
@@ -23,8 +24,9 @@ export function ProjectRow({ project, selected }: ProjectRowProps) {
       )}
     >
       {selected ? (
-        <span
+        <m.span
           aria-hidden="true"
+          layoutId="explorer-selection"
           className="bg-accent absolute inset-0 rounded-md"
           style={{ zIndex: -1 }}
         />
