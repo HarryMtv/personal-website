@@ -51,7 +51,7 @@ export function DesktopIcon({ icon, index, label, className }: DesktopIconProps)
           className={cn(
             'rounded-md px-[7px] py-0.5 font-sans text-[13px]/1.25 font-medium text-white [text-shadow:0_1px_2px_rgb(40_10_0/0.7)]',
             // The active label becomes the blue pill (Link adds aria-current).
-            'aria-[current=page]:bg-accent aria-[current=page]:[text-shadow:none]',
+            'group-aria-[current=page]:bg-accent group-aria-[current=page]:[text-shadow:none]',
           )}
         >
           {label}

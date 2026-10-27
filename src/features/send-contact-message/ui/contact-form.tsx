@@ -245,7 +245,7 @@ function FieldRow({ label, name, invalid, error, optional, children }: FieldRowP
     <div className="border-ink/12 grid grid-cols-[90px_minmax(0,1fr)] items-center gap-3 border-b px-5 py-2.5 max-[560px]:grid-cols-1 max-[560px]:items-start">
       <label htmlFor={name} className="text-muted font-mono text-[13px]">
         {label}
-        {optional ? <span className="text-muted/70"> (optional)</span> : null}
+        {optional ? <span className="text-muted"> (optional)</span> : null}
       </label>
       <div className="flex flex-col gap-1">
         {children({

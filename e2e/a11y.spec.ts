@@ -43,8 +43,7 @@ test('axe after route content mounts (settled DOM)', async ({ page }) => {
   }
 });
 
-// TODO(QA-1): /contact fails WCAG 2 AA color-contrast (3.0:1 < 4.5:1) on `<span class="text-muted/70"> (optional)</span>` once the lazy route mounts.
-test.skip('axe after /contact mounts has zero serious contrast violations', async ({ page }) => {
+test('axe after /contact mounts has zero serious contrast violations', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/contact');
   await expect(page.locator('[data-window]')).toBeVisible();
