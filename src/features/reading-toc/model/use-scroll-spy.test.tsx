@@ -73,4 +73,17 @@ describe('useScrollSpy', () => {
     expect(getByTestId('active')).toHaveTextContent('a');
     vi.unstubAllGlobals();
   });
+
+  it('returns none when ids is empty and updates on hashchange', () => {
+    const { getByTestId, rerender } = render(<Probe ids={[]} />);
+    expect(getByTestId('active')).toHaveTextContent('none');
+
+    rerender(<Probe ids={['a', 'b']} />);
+    window.location.hash = '#b';
+    act(() => {
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+    window.location.hash = '';
+  });
 });

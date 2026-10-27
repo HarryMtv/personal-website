@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getProjectBySlug, getProjects } from './registry';
+import { getProjectBySlug, getProjects, loadCaseStudy } from './registry';
 
 describe('project registry', () => {
   it('parses every content file', () => {
@@ -22,5 +22,11 @@ describe('project registry', () => {
 
   it('marks exactly one project with a case study', () => {
     expect(getProjects().filter((project) => project.hasCaseStudy)).toHaveLength(1);
+  });
+
+  it('throws when loading an unknown case study slug', async () => {
+    await expect(loadCaseStudy('missing-project')).rejects.toThrow(
+      /No case study content for "missing-project"/,
+    );
   });
 });

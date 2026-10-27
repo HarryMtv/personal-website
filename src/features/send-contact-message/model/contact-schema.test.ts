@@ -44,4 +44,24 @@ describe('contactMessageSchema', () => {
     const parsed = contactMessageSchema.parse({ ...valid, message: '  hello there  ' });
     expect(parsed.message).toBe('hello there');
   });
+
+  it('rejects a whitespace-padded message that trims below 10 characters', () => {
+    const result = contactMessageSchema.safeParse({ ...valid, message: '     short     ' });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts exact boundary lengths (10 and 5000 chars for message, 150 for subject) and rejects 5001', () => {
+    expect(contactMessageSchema.safeParse({ ...valid, message: 'a'.repeat(10) }).success).toBe(
+      true,
+    );
+    expect(contactMessageSchema.safeParse({ ...valid, message: 'a'.repeat(5000) }).success).toBe(
+      true,
+    );
+    expect(contactMessageSchema.safeParse({ ...valid, message: 'a'.repeat(5001) }).success).toBe(
+      false,
+    );
+    expect(contactMessageSchema.safeParse({ ...valid, subject: 's'.repeat(150) }).success).toBe(
+      true,
+    );
+  });
 });

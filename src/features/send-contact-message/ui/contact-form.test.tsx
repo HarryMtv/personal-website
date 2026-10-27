@@ -122,4 +122,28 @@ describe('ContactForm', () => {
     expect(honeypot).toHaveAttribute('aria-hidden', 'true');
     expect(honeypot!.tabIndex).toBe(-1);
   });
+
+  it('retries sending when Try again is clicked and allows Write another after success', async () => {
+    let attempts = 0;
+    const transport = createTransport(() => {
+      attempts += 1;
+      if (attempts === 1) return Promise.reject(new Error('first failure'));
+      return Promise.resolve();
+    });
+    const user = userEvent.setup();
+    await mountContact(transport);
+
+    await user.type(screen.getByLabelText(/from/i), 'you@company.com');
+    await user.type(screen.getByPlaceholderText(/hi igor/i), 'this is a long enough message');
+    await user.click(screen.getByRole('button', { name: /send message/i }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: /try again/i }));
+
+    await waitFor(() => expect(screen.getByTestId('contact-success')).toBeInTheDocument());
+    expect(attempts).toBe(2);
+
+    await user.click(screen.getByRole('button', { name: /write another/i }));
+    expect(screen.getByRole('form', { name: /new message/i })).toBeInTheDocument();
+  });
 });

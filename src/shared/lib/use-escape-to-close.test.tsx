@@ -9,6 +9,13 @@ function Probe({ onClose }: { onClose: () => void }) {
     <div>
       <button type="button">outside</button>
       <input placeholder="editable" />
+      <textarea placeholder="notes" />
+      <select aria-label="topic">
+        <option value="a">A</option>
+      </select>
+      <div contentEditable suppressContentEditableWarning data-testid="rich-editor">
+        <span data-testid="nested-span">editable text</span>
+      </div>
     </div>
   );
 }
@@ -28,6 +35,21 @@ describe('useEscapeToClose', () => {
     render(<Probe onClose={onClose} />);
     await user.click(screenInput());
     await user.keyboard('{Escape}');
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('ignores Escape inside textarea, select, or [contenteditable]', () => {
+    const onClose = vi.fn();
+    const { getByPlaceholderText, getByLabelText, getByTestId } = render(
+      <Probe onClose={onClose} />,
+    );
+    for (const element of [
+      getByPlaceholderText('notes'),
+      getByLabelText('topic'),
+      getByTestId('nested-span'),
+    ]) {
+      element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    }
     expect(onClose).not.toHaveBeenCalled();
   });
 

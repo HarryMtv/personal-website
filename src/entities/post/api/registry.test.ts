@@ -31,4 +31,8 @@ describe('post registry', () => {
     const post = getPostBySlug('telegram-pm-hub-in-5-days');
     expect(post?.relatedProject).toBe('pm-telegram-hub');
   });
+
+  it('throws when loading an unknown post slug', async () => {
+    await expect(loadPost('missing-post')).rejects.toThrow(/No content for post "missing-post"/);
+  });
 });

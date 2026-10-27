@@ -99,4 +99,20 @@ describe('router integration', () => {
       '/contact',
     );
   });
+
+  it('shows 404.md for an unknown writing post slug', async () => {
+    await renderApp('/writing/non-existent-post');
+    expect(screen.getByText(/this file doesn.t exist/i)).toBeInTheDocument();
+  });
+
+  it('falls back gracefully on invalid project search params', async () => {
+    await renderApp('/projects?kind=bogus&tag=invalid');
+    const allRows = document.querySelectorAll('a[data-selected]');
+    expect(allRows).toHaveLength(4);
+  });
+
+  it('restores valid project deep links from the URL', async () => {
+    await renderApp('/projects?kind=side&selected=distill');
+    expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent('Distill');
+  });
 });
