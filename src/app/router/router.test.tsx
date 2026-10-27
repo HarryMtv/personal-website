@@ -81,4 +81,22 @@ describe('router integration', () => {
       '/projects',
     );
   });
+
+  it('renders the post with its CONTENTS nav and footer links', async () => {
+    await renderApp('/writing/telegram-pm-hub-in-5-days');
+    expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /day 1 · spec first/i })).toHaveAttribute(
+      'href',
+      '#day-1--spec-first',
+    );
+    expect(screen.getByText(/6 min read/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /see the project/i })).toHaveAttribute(
+      'href',
+      '/projects/pm-telegram-hub',
+    );
+    expect(screen.getByRole('link', { name: /questions\? write to me/i })).toHaveAttribute(
+      'href',
+      '/contact',
+    );
+  });
 });
