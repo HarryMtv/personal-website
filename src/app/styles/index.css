@@ -75,7 +75,8 @@
   --color-primary-foreground: var(--color-ink);
   --color-secondary: var(--color-paper-2);
   --color-secondary-foreground: var(--color-ink);
-  --color-muted: var(--color-paper-2);
+  /* `muted` stays the palette's ink tone (#6A6156); shadcn's `muted` surface
+     role is intentionally not mapped — nothing uses bg-muted here. */
   --color-muted-foreground: var(--color-muted);
   --color-accent-foreground: var(--color-ink);
   --color-destructive: #b3261e;

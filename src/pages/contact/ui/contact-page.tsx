@@ -19,7 +19,10 @@ export function ContactPage() {
           <StickyNote label="elsewhere.txt" rotate={1.2}>
             <p className="m-0">
               Prefer plain email?{' '}
-              <a href={`mailto:${profile.email}`} className="text-accent underline-offset-2">
+              <a
+                href={`mailto:${profile.email}`}
+                className="text-accent underline underline-offset-2"
+              >
                 {profile.email}
               </a>
             </p>

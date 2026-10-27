@@ -3,6 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * E2E config — separate layer from Vitest (src/**). `pnpm test` runs only unit
  * tests; `pnpm test:e2e` runs these. Browsers: `npx playwright install`.
+ * The contact form POSTs to a path Playwright intercepts, so no test ever
+ * reaches Web3Forms.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -16,13 +18,21 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
+    },
+    {
+      name: 'mobile',
+      use: { ...devices['iPhone 13'], browserName: 'chromium' },
     },
   ],
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
+    env: {
+      VITE_CONTACT_ENDPOINT: 'http://localhost:5173/__test/contact',
+      VITE_CONTACT_ACCESS_KEY: 'test',
+    },
   },
 });

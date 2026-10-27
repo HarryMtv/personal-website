@@ -28,19 +28,18 @@ export function ProjectRow({ project, selected }: ProjectRowProps) {
           aria-hidden="true"
           layoutId="explorer-selection"
           className="bg-accent absolute inset-0 rounded-md"
-          style={{ zIndex: -1 }}
         />
       ) : null}
       <span
         className={cn(
-          'flex min-w-0 items-center gap-2.5 truncate font-semibold',
+          'relative flex min-w-0 items-center gap-2.5 truncate font-semibold',
           selected && 'text-white',
         )}
       >
         <FileIcon size={14} aria-hidden="true" className="shrink-0 opacity-70" />
         {project.slug}
       </span>
-      <span className="flex gap-4 max-[760px]:hidden">
+      <span className="relative flex gap-4 max-[760px]:hidden">
         <span className={cn('w-28 shrink-0', selected ? 'text-white/90' : 'text-ink')}>
           {project.kindLabel}
         </span>
