@@ -1,0 +1,65 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 649 >>
+stream
+BT
+/F1 26 Tf 1 0 0 1 56 790 Tm (Igor Martynov) Tj
+/F1 12 Tf 1 0 0 1 56 756 Tm (Senior Frontend Engineer - React - TypeScript) Tj
+/F1 11 Tf 1 0 0 1 56 736 Tm (Prague - github.com/HarryMtv) Tj
+/F1 12 Tf 1 0 0 1 56 703 Tm (SAMPLE CV - placeholder file) Tj
+/F1 10 Tf 1 0 0 1 56 683 Tm (This is a mock document. Replace public/cv/igor-martynov.pdf) Tj
+/F1 10 Tf 1 0 0 1 56 665 Tm (with the real CV \(without personal phone number\) before deploying.) Tj
+/F1 16 Tf 1 0 0 1 56 633 Tm (Summary) Tj
+/F1 10 Tf 1 0 0 1 56 609 Tm ([Summary placeholder]) Tj
+/F1 16 Tf 1 0 0 1 56 577 Tm (Experience) Tj
+/F1 10 Tf 1 0 0 1 56 553 Tm ([Experience placeholder]) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 309 >>
+stream
+BT
+/F1 16 Tf 1 0 0 1 56 790 Tm (Skills) Tj
+/F1 10 Tf 1 0 0 1 56 766 Tm ([Skills placeholder]) Tj
+/F1 16 Tf 1 0 0 1 56 734 Tm (Certifications) Tj
+/F1 10 Tf 1 0 0 1 56 710 Tm ([Certifications placeholder]) Tj
+/F1 16 Tf 1 0 0 1 56 678 Tm (Languages) Tj
+/F1 10 Tf 1 0 0 1 56 654 Tm ([Languages placeholder]) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+7 0 obj
+<< /Type /Catalog /Pages 6 0 R >>
+endobj
+8 0 obj
+<< /Title (Igor Martynov - CV \(sample\)) >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000000779 00000 n 
+0000000905 00000 n 
+0000001265 00000 n 
+0000001391 00000 n 
+0000001454 00000 n 
+0000001503 00000 n 
+trailer
+<< /Size 9 /Root 7 0 R /Info 8 0 R >>
+startxref
+1563
+%%EOF
