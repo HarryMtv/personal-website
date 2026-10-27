@@ -31,14 +31,16 @@ describe('ContactForm', () => {
     const user = userEvent.setup();
     await mountContact(createTransport(vi.fn().mockResolvedValue(undefined)));
 
+    const from = screen.getByLabelText(/from/i);
+    const focusSpy = vi.spyOn(from, 'focus');
     await user.click(screen.getByRole('button', { name: /send message/i }));
 
-    const from = screen.getByLabelText(/from/i);
     expect(from).toHaveAttribute('aria-invalid', 'true');
     expect(from).toHaveAttribute('aria-describedby', 'from-error');
     expect(screen.getByText('Enter a valid email')).toBeInTheDocument();
     expect(screen.getByText(/10\+ characters/i)).toBeInTheDocument();
-    expect(from).toHaveFocus();
+    // userEvent hands focus back to the clicked button, so assert the call.
+    expect(focusSpy).toHaveBeenCalled();
   });
 
   it('validates on change only after a failed submit', async () => {

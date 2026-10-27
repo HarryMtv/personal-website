@@ -233,6 +233,7 @@ interface FieldRowProps {
   optional?: boolean;
   children: (props: {
     id: string;
+    name: string;
     'aria-invalid': boolean;
     'aria-describedby': string | undefined;
   }) => React.ReactElement;
@@ -249,6 +250,7 @@ function FieldRow({ label, name, invalid, error, optional, children }: FieldRowP
       <div className="flex flex-col gap-1">
         {children({
           id: name,
+          name,
           'aria-invalid': invalid,
           'aria-describedby': error ? errorId : undefined,
         })}
