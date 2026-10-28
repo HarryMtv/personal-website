@@ -1,5 +1,6 @@
 import type { MDXContent } from 'mdx/types';
-import { ContentError, postFrontmatterSchema, type LoadedPost, type Post } from '../model/post';
+import { ContentError } from '@/shared/lib/content-error';
+import { postFrontmatterSchema, type LoadedPost, type Post } from '../model/post';
 import type { TocItem } from './toc';
 
 /**

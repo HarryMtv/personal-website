@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-export { ContentError } from '@/shared/lib/content-error';
-
 export const PROJECT_KINDS = ['side', 'work', 'experiment'] as const;
 export type ProjectKind = (typeof PROJECT_KINDS)[number];
 

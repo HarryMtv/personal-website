@@ -1,6 +1,6 @@
+export { ContentError } from '@/shared/lib/content-error';
 export {
   postFrontmatterSchema,
-  ContentError,
   type Post,
   type PostFrontmatter,
   type LoadedPost,

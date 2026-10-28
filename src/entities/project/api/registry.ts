@@ -1,5 +1,6 @@
 import type { MDXContent } from 'mdx/types';
-import { ContentError, projectFrontmatterSchema, type Project } from '../model/project';
+import { ContentError } from '@/shared/lib/content-error';
+import { projectFrontmatterSchema, type Project } from '../model/project';
 
 /**
  * The content pipeline: content/projects/*.mdx → remark frontmatter →

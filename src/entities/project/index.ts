@@ -1,10 +1,10 @@
+export { ContentError } from '@/shared/lib/content-error';
 export {
   PROJECT_KINDS,
   PROJECT_KIND_LABELS,
   PROJECT_TAGS,
   PROJECT_TAG_META,
   projectFrontmatterSchema,
-  ContentError,
   type Project,
   type ProjectFrontmatter,
   type ProjectKind,

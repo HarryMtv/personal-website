@@ -2,8 +2,6 @@ import type { MDXContent } from 'mdx/types';
 import { z } from 'zod';
 import type { TocItem } from '../api/toc';
 
-export { ContentError } from '@/shared/lib/content-error';
-
 export const postFrontmatterSchema = z.object({
   title: z.string().min(1),
   summary: z.string().min(1),
