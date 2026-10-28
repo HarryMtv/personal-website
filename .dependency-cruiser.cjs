@@ -58,25 +58,25 @@ module.exports = {
       name: 'fsd-public-api-pages',
       severity: 'error',
       from: { path: '^src/app/' },
-      to: { path: '^src/pages/([^/]+)/.+', pathNot: '(^|/)index\\.tsx?$' },
+      to: { path: '^src/pages/([^/]+)/.+', pathNot: '^src/pages/[^/]+/index\\.tsx?$' },
     },
     {
       name: 'fsd-public-api-widgets',
       severity: 'error',
       from: { path: '^src/(app|pages)/' },
-      to: { path: '^src/widgets/([^/]+)/.+', pathNot: '(^|/)index\\.tsx?$' },
+      to: { path: '^src/widgets/([^/]+)/.+', pathNot: '^src/widgets/[^/]+/index\\.tsx?$' },
     },
     {
       name: 'fsd-public-api-features',
       severity: 'error',
       from: { path: '^src/(app|pages|widgets)/' },
-      to: { path: '^src/features/([^/]+)/.+', pathNot: '(^|/)index\\.tsx?$' },
+      to: { path: '^src/features/([^/]+)/.+', pathNot: '^src/features/[^/]+/index\\.tsx?$' },
     },
     {
       name: 'fsd-public-api-entities',
       severity: 'error',
       from: { path: '^src/(app|pages|widgets|features)/' },
-      to: { path: '^src/entities/([^/]+)/.+', pathNot: '(^|/)index\\.tsx?$' },
+      to: { path: '^src/entities/([^/]+)/.+', pathNot: '^src/entities/[^/]+/index\\.tsx?$' },
     },
 
     // --- content is only reachable from entity api segments ---

@@ -137,6 +137,16 @@
   }
 }
 
+/* Gating only the custom keyframes still leaves the UA default crossfade
+   and the group size/position morph running — kill the whole transition. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(window),
+  ::view-transition-old(window),
+  ::view-transition-new(window) {
+    animation: none;
+  }
+}
+
 @keyframes window-out {
   to {
     opacity: 0;

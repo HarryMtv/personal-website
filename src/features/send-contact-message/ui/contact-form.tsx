@@ -109,13 +109,9 @@ export function ContactForm({ transport }: { transport?: ContactTransport }) {
       aria-label="New message"
     >
       <div className="border-ink/12 grid grid-cols-[90px_minmax(0,1fr)] items-center gap-3 border-b px-5 py-2.5 max-[560px]:grid-cols-1 max-[560px]:items-start">
-        <label htmlFor="to" className="text-muted font-mono text-[13px]">
-          To
-        </label>
-        <span
-          id="to"
-          className="bg-accent-soft text-accent-hover inline-flex w-fit items-center rounded-full px-2.5 py-1 text-sm font-medium"
-        >
+        {/* Not a <label>: the recipient is a pill, not a labelable field. */}
+        <span className="text-muted font-mono text-[13px]">To</span>
+        <span className="bg-accent-soft text-accent-hover inline-flex w-fit items-center rounded-full px-2.5 py-1 text-sm font-medium">
           Igor Martynov
         </span>
       </div>
@@ -169,7 +165,8 @@ export function ContactForm({ transport }: { transport?: ContactTransport }) {
         className="text-base/1.6 text-ink min-h-[260px] flex-1 resize-y border-0 bg-transparent p-5 outline-none"
       />
       {errors.message ? (
-        <p id="message-error" role="alert" className="text-destructive m-0 px-5 pb-1 text-sm">
+        // Announced via focus + aria-describedby, same as the field errors.
+        <p id="message-error" className="text-destructive m-0 px-5 pb-1 text-sm">
           {errors.message}
         </p>
       ) : null}

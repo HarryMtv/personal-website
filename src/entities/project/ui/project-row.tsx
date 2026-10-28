@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { m } from 'motion/react';
 import { FileIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
@@ -11,12 +11,32 @@ interface ProjectRowProps {
 
 /** One explorer row: NAME / KIND / STACK. The selection lives in the URL. */
 export function ProjectRow({ project, selected }: ProjectRowProps) {
+  const router = useRouter();
+  const navigate = useNavigate();
+  // A plain anchor, not a Link: the row targets the route it already sits
+  // on, which the router would mark aria-current="page" — selection is not
+  // a page, so the href is built by hand and the marker stays ours.
+  const href = router.buildLocation({
+    to: '/projects',
+    search: (prev) => ({ ...prev, selected: project.slug }),
+  }).href;
+
   return (
-    <Link
-      to="/projects"
-      search={(prev) => ({ ...prev, selected: project.slug })}
-      replace
+    <a
+      href={href}
+      aria-current={selected ? 'true' : undefined}
       data-selected={selected}
+      onClick={(event) => {
+        // Modified clicks fall through to the real href in a new tab.
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+          return;
+        event.preventDefault();
+        void navigate({
+          to: '/projects',
+          search: (prev) => ({ ...prev, selected: project.slug }),
+          replace: true,
+        });
+      }}
       className={cn(
         'text-ink relative grid items-center gap-x-3 rounded-md px-3 py-2.5 text-sm',
         'grid-cols-[minmax(0,1fr)_auto] max-[760px]:grid-cols-1',
@@ -47,6 +67,6 @@ export function ProjectRow({ project, selected }: ProjectRowProps) {
           {project.stackShort}
         </span>
       </span>
-    </Link>
+    </a>
   );
 }
