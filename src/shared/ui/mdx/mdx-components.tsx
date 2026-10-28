@@ -26,11 +26,15 @@ export const mdxComponents: MDXComponents = {
   a: ({ href, children }: { href?: string; children?: ReactNode }) => {
     if (href?.startsWith('/')) {
       return (
-        <Link to={href} className="text-accent underline-offset-2 hover:underline">
+        <Link to={href} className="text-accent underline underline-offset-2">
           {children}
         </Link>
       );
     }
-    return <ExternalLink href={href}>{children}</ExternalLink>;
+    return (
+      <ExternalLink href={href} className="underline">
+        {children}
+      </ExternalLink>
+    );
   },
 };
