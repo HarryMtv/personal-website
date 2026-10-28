@@ -47,8 +47,10 @@ describe('parseEnv', () => {
     expect(parsed.VITE_CONTACT_ACCESS_KEY).toBeUndefined();
   });
 
-  it('throws on genuinely invalid values in dev', () => {
+  it('throws a readable error naming the invalid key in dev', () => {
     // Vitest runs with import.meta.env.DEV = true.
-    expect(() => parseEnv({ VITE_SITE_URL: 'not-a-url' })).toThrow();
+    expect(() => parseEnv({ VITE_SITE_URL: 'not-a-url' })).toThrow(
+      /Invalid environment variables:[\s\S]*VITE_SITE_URL/,
+    );
   });
 });

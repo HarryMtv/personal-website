@@ -181,11 +181,61 @@ describe('useScrollSpy', () => {
     vi.unstubAllGlobals();
   });
 
-  it('activates the last section at the bottom of the page', () => {
+  it('lifts the hash pin on touchmove and paging keys, but not on non-paging keys', () => {
     vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
     MockIntersectionObserver.callbacks = [];
     MockIntersectionObserver.instances = [];
-    const restore = stubScrollGeometry({ innerHeight: 800, scrollY: 1200, scrollHeight: 2000 });
+    window.location.hash = '#b';
+    const { getByTestId } = render(<Probe ids={['a', 'b']} />);
+
+    const callback = MockIntersectionObserver.callbacks[0];
+    const observer = new MockIntersectionObserver(vi.fn());
+
+    // Non-scroll keys (like Escape or Tab) do not clear the pin.
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+
+    // A paging key lifts the pin.
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' }));
+    });
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('a');
+
+    // Re-pin via hashchange, then lift via touchmove.
+    window.location.hash = '#b';
+    act(() => {
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+    act(() => {
+      window.dispatchEvent(new Event('touchmove'));
+    });
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('a');
+
+    window.location.hash = '';
+    vi.unstubAllGlobals();
+  });
+
+  it('activates the last section at the bottom of the page, but not on a non-scrollable page', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+    MockIntersectionObserver.callbacks = [];
+    MockIntersectionObserver.instances = [];
+    const restoreScrollable = stubScrollGeometry({
+      innerHeight: 800,
+      scrollY: 1200,
+      scrollHeight: 2000,
+    });
     const { getByTestId } = render(<Probe ids={['a', 'b']} />);
 
     // Earlier headings fill the top zone at the bottom of a long page, but
@@ -196,8 +246,17 @@ describe('useScrollSpy', () => {
       callback([entry('a', true)], observer);
     });
     expect(getByTestId('active')).toHaveTextContent('b');
+    restoreScrollable();
 
-    restore();
+    // On a short page that cannot scroll (scrollHeight <= innerHeight), the
+    // intersecting top section wins instead of forcing the last section.
+    const restoreShort = stubScrollGeometry({ innerHeight: 800, scrollY: 0, scrollHeight: 800 });
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('a');
+
+    restoreShort();
     window.location.hash = '';
     vi.unstubAllGlobals();
   });
