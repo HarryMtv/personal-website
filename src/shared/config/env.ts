@@ -1,23 +1,32 @@
 import { z } from 'zod';
 
+// Vite (and the Dockerfile's ARG passthrough) yields "" for unset vars, and
+// an empty string is not a URL — normalize each field before validating so
+// one empty var never drags the whole env into the fallback.
+const emptyAsUndefined = <T extends z.ZodType>(schema: T) =>
+  z.preprocess((value) => (value === '' ? undefined : value), schema);
+
 const envSchema = z.object({
-  VITE_SITE_URL: z.url().default('https://martynov.dev'),
-  VITE_CONTACT_ENDPOINT: z
-    .url()
-    .optional()
-    .transform((value) => value ?? undefined),
-  VITE_CONTACT_ACCESS_KEY: z.string().optional(),
+  VITE_SITE_URL: emptyAsUndefined(z.url().default('https://martynov.dev')),
+  VITE_CONTACT_ENDPOINT: emptyAsUndefined(z.url().optional()),
+  VITE_CONTACT_ACCESS_KEY: emptyAsUndefined(z.string().optional()),
 });
 
 export type Env = z.infer<typeof envSchema>;
 
-/** Parses raw import.meta.env-shaped objects; invalid values fall back. */
+/**
+ * Parses raw import.meta.env-shaped objects. Genuinely invalid values throw
+ * in dev and fall back to defaults (with a log) in production builds.
+ */
 export function parseEnv(raw: Record<string, unknown>): Env {
   const safeParse = envSchema.safeParse(raw);
   if (safeParse.success) {
     return safeParse.data;
   }
-  // Fail loudly in dev, quietly fall back in production builds.
+  if (import.meta.env.DEV) {
+    throw safeParse.error;
+  }
+  console.error('Invalid environment variables, falling back to defaults:', safeParse.error);
   return envSchema.parse({});
 }
 
