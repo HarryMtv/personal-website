@@ -2,7 +2,11 @@ import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useFocusWindowOnNavigate } from './use-focus-window-on-navigate';
 
-type Listener = (event: { toLocation: unknown; fromLocation: unknown; pathChanged: boolean }) => void;
+type Listener = (event: {
+  toLocation: unknown;
+  fromLocation: unknown;
+  pathChanged: boolean;
+}) => void;
 
 const listeners = new Set<Listener>();
 
