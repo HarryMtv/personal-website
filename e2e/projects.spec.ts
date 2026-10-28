@@ -15,6 +15,15 @@ test('a row click updates the preview', async ({ page }) => {
   await expect(page.getByRole('complementary', { name: 'Preview' })).toContainText('Distill');
 });
 
+test('keyboard filter activation keeps focus on the filter button', async ({ page }) => {
+  await page.goto('/projects');
+  const work = page.getByRole('button', { name: 'Work' });
+  await work.focus();
+  await work.press('Enter');
+  await expect(page).toHaveURL(/kind=work/);
+  await expect(work).toBeFocused();
+});
+
 test('opening the case study and closing back', async ({ page }) => {
   await page.goto('/projects');
   await page.getByRole('link', { name: /open case study/i }).click();

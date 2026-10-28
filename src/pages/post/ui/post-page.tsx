@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link, getRouteApi } from '@tanstack/react-router';
 import { flattenToc } from '@/entities/post';
 import { formatDate } from '@/shared/lib/format-date';
@@ -10,8 +11,9 @@ const route = getRouteApi('/writing/$slug');
 /** The writing/<slug>.md reader window. */
 export function PostPage() {
   const { post, Content, tableOfContents } = route.useLoaderData();
-  const toc = flattenToc(tableOfContents);
-  const activeId = useScrollSpy(toc.map((item) => item.id));
+  const toc = useMemo(() => flattenToc(tableOfContents), [tableOfContents]);
+  const tocIds = useMemo(() => toc.map((item) => item.id), [toc]);
+  const activeId = useScrollSpy(tocIds);
 
   return (
     <Window

@@ -86,4 +86,30 @@ describe('useScrollSpy', () => {
     expect(getByTestId('active')).toHaveTextContent('b');
     window.location.hash = '';
   });
+
+  it('keeps the scrolled section when re-rendered with a new but equal ids array', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+    MockIntersectionObserver.callbacks = [];
+    MockIntersectionObserver.instances = [];
+    window.location.hash = '#a';
+    const { getByTestId, rerender } = render(<Probe ids={['a', 'b']} />);
+
+    // The user scrolled (the observer reports b) after a TOC visit left #a.
+    const callback = MockIntersectionObserver.callbacks[0];
+    const observer = new MockIntersectionObserver(vi.fn());
+    const instancesAfterMount = MockIntersectionObserver.instances.length;
+    act(() => {
+      callback([entry('b', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+
+    // A re-render hands the hook a fresh array with the same ids; the
+    // highlight must stay on b and the observer must not be re-created.
+    rerender(<Probe ids={['a', 'b'].slice()} />);
+    expect(getByTestId('active')).toHaveTextContent('b');
+    expect(MockIntersectionObserver.instances).toHaveLength(instancesAfterMount);
+
+    window.location.hash = '';
+    vi.unstubAllGlobals();
+  });
 });

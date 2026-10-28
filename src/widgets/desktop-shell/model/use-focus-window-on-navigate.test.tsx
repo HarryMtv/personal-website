@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useFocusWindowOnNavigate } from './use-focus-window-on-navigate';
 
-type Listener = (event: { toLocation: unknown; fromLocation: unknown }) => void;
+type Listener = (event: { toLocation: unknown; fromLocation: unknown; pathChanged: boolean }) => void;
 
 const listeners = new Set<Listener>();
 
@@ -20,8 +20,8 @@ function Probe() {
   return <div data-window="" tabIndex={-1} />;
 }
 
-function resolve() {
-  listeners.forEach((listener) => listener({ toLocation: {}, fromLocation: {} }));
+function resolve(pathChanged = true) {
+  listeners.forEach((listener) => listener({ toLocation: {}, fromLocation: {}, pathChanged }));
 }
 
 describe('useFocusWindowOnNavigate', () => {
@@ -39,6 +39,15 @@ describe('useFocusWindowOnNavigate', () => {
     resolve();
     resolve();
     expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+    focusSpy.mockRestore();
+  });
+
+  it('keeps focus on search-only navigations (filters, row selection)', () => {
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
+    render(<Probe />);
+    resolve(); // initial load
+    resolve(false); // same path, new search params
+    expect(focusSpy).not.toHaveBeenCalled();
     focusSpy.mockRestore();
   });
 });

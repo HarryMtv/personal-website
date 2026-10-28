@@ -8,18 +8,23 @@ import { useEffect, useState } from 'react';
  */
 export function useScrollSpy(ids: string[], rootMargin = '0px 0px -60% 0px'): string | undefined {
   const [activeId, setActiveId] = useState<string | undefined>(ids[0]);
+  // A fresh-but-equal array (e.g. `toc.map(...)` on every render) must not
+  // re-subscribe the observer, so the effect keys on the joined ids rather
+  // than the array identity.
+  const idsKey = ids.join('|');
 
   useEffect(() => {
-    if (ids.length === 0) return;
+    const sectionIds = idsKey === '' ? [] : idsKey.split('|');
+    if (sectionIds.length === 0) return;
 
     const syncFromHash = () => {
       const id = window.location.hash.slice(1);
-      if (id && ids.includes(id)) setActiveId(id);
+      if (id && sectionIds.includes(id)) setActiveId(id);
     };
     syncFromHash();
     window.addEventListener('hashchange', syncFromHash);
 
-    const elements = ids
+    const elements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((element): element is HTMLElement => element !== null);
     if (elements.length === 0) return () => window.removeEventListener('hashchange', syncFromHash);
@@ -40,7 +45,7 @@ export function useScrollSpy(ids: string[], rootMargin = '0px 0px -60% 0px'): st
       observer.disconnect();
       window.removeEventListener('hashchange', syncFromHash);
     };
-  }, [ids, rootMargin]);
+  }, [idsKey, rootMargin]);
 
   return activeId;
 }
