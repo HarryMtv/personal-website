@@ -2,10 +2,7 @@
 @import 'tw-animate-css';
 @import './fonts.css';
 
-/*
- * Design tokens transcribed from the "desktop OS" mock
- * (docs/Igor Martynov — personal site.html).
- */
+/* Design tokens transcribed from the "desktop OS" design mock. */
 @theme {
   /* wallpaper / desk */
   --color-wall: #a94b27;
