@@ -59,7 +59,7 @@ export function ProjectCaseStudyPage() {
 
         <CaseStudyFacts project={project} />
         {project.screenshot ? (
-          <Screenshot src={project.screenshot} caption={project.screenshotCaption} />
+          <Screenshot {...project.screenshot} caption={project.screenshotCaption} />
         ) : project.screenshotCaption ? (
           <Placeholder ratio="16/8" caption={project.screenshotCaption} />
         ) : null}

@@ -13,7 +13,7 @@ export function ProjectPreview({ project }: { project: Project }) {
       className="border-ink/12 bg-card flex max-w-[400px] min-w-0 flex-1 basis-[320px] flex-col gap-4 border-l p-6 max-[760px]:max-w-none max-[760px]:border-t max-[760px]:border-l-0"
     >
       {project.screenshot ? (
-        <Screenshot src={project.screenshot} caption={project.screenshotCaption} />
+        <Screenshot {...project.screenshot} caption={project.screenshotCaption} />
       ) : project.screenshotCaption ? (
         <Placeholder ratio="4/3" caption={project.screenshotCaption} />
       ) : null}

@@ -72,6 +72,13 @@ describe('ProjectExplorer', () => {
     expect(screen.queryByRole('link', { name: /open case study/i })).not.toBeInTheDocument();
   });
 
+  it('shows the real screenshot instead of the placeholder when one is set', async () => {
+    await mountExplorer({ kind: 'all', selected: 'pm-telegram-hub' });
+    const figure = screen.getByRole('figure', { name: /the mini app/i });
+    expect(figure.querySelector('img')).toHaveAttribute('src', '/images/pm-telegram-hub.png');
+    expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
+  });
+
   it('omits the screenshot when a project sets neither image nor caption', async () => {
     await mountExplorer({ kind: 'all', selected: 'create-frontstack' });
     expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
