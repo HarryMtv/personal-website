@@ -24,7 +24,9 @@ export function parseEnv(raw: Record<string, unknown>): Env {
     return safeParse.data;
   }
   if (import.meta.env.DEV) {
-    throw safeParse.error;
+    // Module-eval throw — name the offending keys so a .env typo doesn't
+    // read as an unrelated blank page.
+    throw new Error(`Invalid environment variables:\n${z.prettifyError(safeParse.error)}`);
   }
   console.error('Invalid environment variables, falling back to defaults:', safeParse.error);
   return envSchema.parse({});
