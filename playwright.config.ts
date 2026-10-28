@@ -6,6 +6,9 @@ import { defineConfig, devices } from '@playwright/test';
  * The contact form POSTs to a path Playwright intercepts, so no test ever
  * reaches Web3Forms.
  */
+const port = process.env.PLAYWRIGHT_PORT ?? '5173';
+const baseURL = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -13,7 +16,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -27,11 +30,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
+    command: `pnpm dev --port ${port} --strictPort`,
+    url: baseURL,
+    reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_PORT,
     env: {
-      VITE_CONTACT_ENDPOINT: 'http://localhost:5173/__test/contact',
+      VITE_CONTACT_ENDPOINT: `${baseURL}/__test/contact`,
       VITE_CONTACT_ACCESS_KEY: 'test',
     },
   },

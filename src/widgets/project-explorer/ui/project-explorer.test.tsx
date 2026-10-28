@@ -32,12 +32,25 @@ describe('ProjectExplorer', () => {
     expect(router.state.location.search).toEqual({});
   });
 
-  it('selects a row via the URL', async () => {
+  it('selects a row via the URL and marks only the selected row with aria-current="true"', async () => {
     const user = userEvent.setup();
     const { router } = await mountExplorer({ kind: 'all' });
+    const rows = screen.getAllByRole('link').filter((link) => link.dataset.selected !== undefined);
+    expect(rows[0]).toHaveAttribute('aria-current', 'true');
+    expect(rows[1]).not.toHaveAttribute('aria-current');
+
     await user.click(screen.getByText('distill'));
     // The widget is pure; the page re-derives the preview from this URL state.
     expect(router.state.location.search).toMatchObject({ selected: 'distill' });
+  });
+
+  it('ignores modified clicks on a row so the browser can open a new tab', async () => {
+    const user = userEvent.setup();
+    const { router } = await mountExplorer({ kind: 'all' });
+    await user.keyboard('{Meta>}');
+    await user.click(screen.getByText('distill'));
+    await user.keyboard('{/Meta}');
+    expect(router.state.location.search).toEqual({});
   });
 
   it('previews the URL-selected project', async () => {
