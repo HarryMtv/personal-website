@@ -1,0 +1,18 @@
+export { ContentError } from '@/shared/lib/content-error';
+export {
+  PROJECT_KINDS,
+  PROJECT_KIND_LABELS,
+  PROJECT_TAGS,
+  PROJECT_TAG_META,
+  projectFrontmatterSchema,
+  type Project,
+  type ProjectFrontmatter,
+  type ProjectKind,
+  type ProjectTag,
+} from './model/project';
+export { getProjects, getProjectBySlug, loadCaseStudy } from './api/registry';
+export { ProjectRow } from './ui/project-row';
+export { ProjectPreview } from './ui/project-preview';
+export { CaseStudyFacts } from './ui/case-study-facts';
+export { FlowDiagram, type FlowDiagramProps, type FlowNode } from './ui/flow-diagram';
+export { Columns } from './ui/columns';

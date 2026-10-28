@@ -1,0 +1,42 @@
+---
+title: 'Building a Telegram PM hub in five days with AI'
+summary: 'Day by day: from a technical spec to a phased plan, a multi-model setup, and a bot that talks to ClickUp, Wrike and Jira.'
+lead: 'A day-by-day log of going from a spec to a working bot that talks to ClickUp, Wrike and Jira — and what each model was actually good at.'
+# TODO(content): pin the real reading time and the publish date.
+readingMinutes: 6
+source: 'Medium'
+relatedProject: 'pm-telegram-hub'
+draft: false
+---
+
+## Day 1 · Spec first
+
+Before any code, I wrote a technical spec and turned it into a phased implementation plan with OpenSpec. Claude handled architecture and UI decisions; a second, cheaper model did the bulk implementation.
+
+```ts
+interface TrackerAdapter {
+  getTask(id: string): Promise<Task>;
+  addComment(taskId: string, text: string): Promise<void>;
+  onTaskUpdated(cb: (e: TaskEvent) => void): Unsubscribe;
+}
+```
+
+[Why the adapters layer came first, and what it cost to keep it honest across three very different APIs.]
+
+> [A pull quote — the one line you'd want someone to remember.]
+
+## Day 2 · [Title]
+
+[Section text]
+
+## Day 3 · [Title]
+
+[Section text]
+
+## Day 4 · [Title]
+
+[Section text]
+
+## Day 5 · [Title]
+
+[Section text]

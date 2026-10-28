@@ -15,6 +15,13 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 
 # ---- Build ----
 FROM base AS build
+# Site URL and contact transport are baked into the client bundle.
+ARG VITE_SITE_URL
+ARG VITE_CONTACT_ENDPOINT
+ARG VITE_CONTACT_ACCESS_KEY
+ENV VITE_SITE_URL=${VITE_SITE_URL}
+ENV VITE_CONTACT_ENDPOINT=${VITE_CONTACT_ENDPOINT}
+ENV VITE_CONTACT_ACCESS_KEY=${VITE_CONTACT_ACCESS_KEY}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build

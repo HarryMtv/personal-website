@@ -17,7 +17,7 @@ dist-ssr
 *.local
 
 # Generated route tree (do not edit; produced by tsr generate / router plugin)
-src/routeTree.gen.ts
+src/app/routeTree.gen.ts
 
 # Test output
 coverage

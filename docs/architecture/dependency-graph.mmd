@@ -1,0 +1,1110 @@
+flowchart LR
+
+subgraph 0["src"]
+subgraph 1["app"]
+2["main.tsx"]
+subgraph 3["styles"]
+4["index.css"]
+end
+subgraph N["providers"]
+O["app-providers.tsx"]
+end
+subgraph 1C["router"]
+1D["router.ts"]
+2N["router.test.tsx"]
+end
+subgraph 3S["routes"]
+3T["__root.tsx"]
+4I["contact.tsx"]
+5J["cv.tsx"]
+65["desktop.tsx"]
+6A["experience.tsx"]
+6F["hobbies.tsx"]
+6N["index.tsx"]
+6T["now.tsx"]
+subgraph 6Y["projects"]
+6Z["$slug.tsx"]
+7A["index.tsx"]
+end
+7Q["stack.tsx"]
+7V["trash.tsx"]
+subgraph 80["writing"]
+81["$slug.tsx"]
+8C["index.tsx"]
+end
+end
+8H["vite-env.d.ts"]
+end
+subgraph 19["shared"]
+subgraph 1A["lib"]
+1B["query-client.ts"]
+1W["cn.ts"]
+2G["use-escape-to-close.ts"]
+2H["use-media-query.ts"]
+3D["format-date.ts"]
+4D["use-prague-clock.ts"]
+subgraph 8Y["test"]
+8Z["render-with-router.tsx"]
+9O["render.test.tsx"]
+9P["setup.ts"]
+end
+9M["cn.test.ts"]
+9N["format-date.test.ts"]
+9V["use-escape-to-close.test.tsx"]
+9W["use-media-query.test.ts"]
+9X["use-prague-clock.test.ts"]
+end
+subgraph 1J["ui"]
+1K["button.tsx"]
+subgraph 27["window"]
+28["index.ts"]
+29["window.tsx"]
+2I["window-skeleton.tsx"]
+A6["window.test.tsx"]
+end
+3O["chip.tsx"]
+3Q["placeholder.tsx"]
+subgraph 4E["icons"]
+4F["brand-icons.tsx"]
+A2["brand-icons.test.tsx"]
+end
+5I["sticky-note.tsx"]
+6K["card.tsx"]
+subgraph 6L["motion"]
+6M["stagger-list.tsx"]
+end
+6S["section-label.tsx"]
+subgraph 74["mdx"]
+75["index.ts"]
+76["mdx-components.tsx"]
+78["pull-quote.tsx"]
+79["prose.tsx"]
+end
+77["external-link.tsx"]
+9Y["button.test.tsx"]
+9Z["card.test.tsx"]
+A0["chip.test.tsx"]
+A1["external-link.test.tsx"]
+A3["placeholder.test.tsx"]
+A4["section-label.test.tsx"]
+A5["sticky-note.test.tsx"]
+end
+subgraph 50["config"]
+51["site.ts"]
+52["env.ts"]
+9K["env.test.ts"]
+9L["site.test.ts"]
+end
+end
+subgraph 1E["pages"]
+subgraph 1F["error"]
+1G["index.ts"]
+subgraph 1H["ui"]
+1I["error-page.tsx"]
+9C["error-page.test.tsx"]
+end
+end
+subgraph 2J["not-found"]
+2K["index.ts"]
+subgraph 2L["ui"]
+2M["not-found-page.tsx"]
+9F["not-found-page.test.tsx"]
+end
+end
+subgraph 4J["contact"]
+4K["index.ts"]
+subgraph 4L["ui"]
+4M["contact-page.tsx"]
+end
+end
+subgraph 5K["cv"]
+5L["index.ts"]
+subgraph 5M["ui"]
+5N["cv-page.tsx"]
+9A["cv-page.test.tsx"]
+end
+end
+subgraph 66["desktop-empty"]
+67["index.ts"]
+subgraph 68["ui"]
+69["desktop-empty-page.tsx"]
+9B["desktop-empty-page.test.tsx"]
+end
+end
+subgraph 6B["experience"]
+6C["index.ts"]
+subgraph 6D["ui"]
+6E["experience-page.tsx"]
+9D["experience-page.test.tsx"]
+end
+end
+subgraph 6G["hobbies"]
+6H["index.ts"]
+subgraph 6I["ui"]
+6J["hobbies-page.tsx"]
+9E["hobbies-page.test.tsx"]
+end
+end
+subgraph 6O["about"]
+6P["index.ts"]
+subgraph 6Q["ui"]
+6R["about-page.tsx"]
+99["about-page.test.tsx"]
+end
+end
+subgraph 6U["now"]
+6V["index.ts"]
+subgraph 6W["ui"]
+6X["now-page.tsx"]
+9G["now-page.test.tsx"]
+end
+end
+subgraph 70["project-case-study"]
+71["index.ts"]
+subgraph 72["ui"]
+73["project-case-study-page.tsx"]
+end
+end
+subgraph 7I["projects"]
+7J["index.ts"]
+subgraph 7K["ui"]
+7L["projects-page.tsx"]
+end
+end
+subgraph 7R["stack"]
+7S["index.ts"]
+subgraph 7T["ui"]
+7U["stack-page.tsx"]
+9H["stack-page.test.tsx"]
+end
+end
+subgraph 7W["trash"]
+7X["index.ts"]
+subgraph 7Y["ui"]
+7Z["trash-page.tsx"]
+9I["trash-page.test.tsx"]
+end
+end
+subgraph 82["post"]
+83["index.ts"]
+subgraph 84["ui"]
+85["post-page.tsx"]
+end
+end
+subgraph 8D["writing"]
+8E["index.ts"]
+subgraph 8F["ui"]
+8G["writing-page.tsx"]
+9J["writing-page.test.tsx"]
+end
+end
+end
+subgraph 2Z["entities"]
+subgraph 30["post"]
+31["index.ts"]
+subgraph 32["api"]
+33["registry.ts"]
+3A["toc.ts"]
+8J["registry.test.ts"]
+end
+subgraph 34["model"]
+35["post.ts"]
+end
+subgraph 3B["ui"]
+3C["post-card.tsx"]
+end
+end
+subgraph 3E["project"]
+3F["index.ts"]
+subgraph 3G["api"]
+3H["registry.ts"]
+8L["registry.test.ts"]
+end
+subgraph 3I["model"]
+3J["project.ts"]
+end
+subgraph 3K["ui"]
+3L["case-study-facts.tsx"]
+3M["columns.tsx"]
+3N["flow-diagram.tsx"]
+3P["project-preview.tsx"]
+3R["project-row.tsx"]
+end
+end
+subgraph 4N["profile"]
+4O["index.ts"]
+subgraph 4P["model"]
+4Q["cv-file.ts"]
+4R["profile.ts"]
+end
+subgraph 4S["ui"]
+4T["language-meter.tsx"]
+4U["social-links.tsx"]
+8K["social-links.test.tsx"]
+end
+end
+subgraph 5Y["experience"]
+5Z["index.ts"]
+subgraph 60["model"]
+61["positions.ts"]
+8I["positions.test.ts"]
+end
+subgraph 62["ui"]
+63["cv-position.tsx"]
+64["timeline.tsx"]
+end
+end
+end
+subgraph 41["widgets"]
+subgraph 42["desktop-shell"]
+43["index.ts"]
+subgraph 44["config"]
+45["desktop-icons.ts"]
+A8["desktop-icons.test.ts"]
+end
+subgraph 46["ui"]
+47["desktop-shell.tsx"]
+4A["icon-rail.tsx"]
+4B["desktop-icon.tsx"]
+4C["menu-bar.tsx"]
+4G["mobile-icon-grid.tsx"]
+4H["skip-link.tsx"]
+AA["desktop-shell.test.tsx"]
+AB["menu-bar.test.tsx"]
+end
+subgraph 48["model"]
+49["use-focus-window-on-navigate.ts"]
+A9["use-focus-window-on-navigate.test.tsx"]
+end
+end
+subgraph 5U["cv-document"]
+5V["index.ts"]
+subgraph 5W["ui"]
+5X["cv-document.tsx"]
+A7["cv-document.test.tsx"]
+end
+end
+subgraph 7M["project-explorer"]
+7N["index.ts"]
+subgraph 7O["ui"]
+7P["project-explorer.tsx"]
+AC["project-explorer.test.tsx"]
+end
+end
+end
+subgraph 4V["features"]
+subgraph 4W["send-contact-message"]
+4X["index.ts"]
+subgraph 4Y["api"]
+4Z["mailto-transport.ts"]
+53["resolve-transport.ts"]
+54["web3forms-transport.ts"]
+55["transport.ts"]
+92["mailto-transport.test.ts"]
+93["resolve-transport.test.ts"]
+94["web3forms-transport.test.ts"]
+end
+subgraph 56["model"]
+57["contact-draft-store.ts"]
+5D["contact-schema.ts"]
+5E["use-send-contact-message.ts"]
+95["contact-draft-store.test.ts"]
+96["contact-schema.test.ts"]
+97["use-send-contact-message.test.tsx"]
+end
+subgraph 5F["ui"]
+5G["contact-form.tsx"]
+5H["topic-pills.tsx"]
+98["contact-form.test.tsx"]
+end
+end
+subgraph 5O["document-zoom"]
+5P["index.ts"]
+subgraph 5Q["model"]
+5R["use-zoom.ts"]
+8M["use-zoom.test.ts"]
+end
+subgraph 5S["ui"]
+5T["zoom-controls.tsx"]
+8N["zoom-controls.test.tsx"]
+end
+end
+subgraph 7B["filter-projects"]
+7C["index.ts"]
+subgraph 7D["model"]
+7E["filter-projects.ts"]
+7F["search.ts"]
+8V["filter-projects.test.ts"]
+8W["search.test.ts"]
+end
+subgraph 7G["ui"]
+7H["filter-sidebar.tsx"]
+8X["filter-sidebar.test.tsx"]
+end
+end
+subgraph 86["reading-toc"]
+87["index.ts"]
+subgraph 88["model"]
+89["use-scroll-spy.ts"]
+90["use-scroll-spy.test.tsx"]
+end
+subgraph 8A["ui"]
+8B["table-of-contents.tsx"]
+91["table-of-contents.test.tsx"]
+end
+end
+end
+end
+subgraph 5["node_modules"]
+subgraph 6[".pnpm"]
+subgraph 7["@tanstack+react-router@1.170.46_react-dom@19.3.1_react@19.3.1__react@19.3.1"]
+subgraph 8["node_modules"]
+subgraph 9["@tanstack"]
+subgraph A["react-router"]
+subgraph B["dist"]
+subgraph C["cjs"]
+D["index.cjs"]
+end
+end
+end
+end
+end
+end
+subgraph E["react@19.3.1"]
+subgraph F["node_modules"]
+subgraph G["react"]
+H["index.js"]
+M["jsx-runtime.js"]
+end
+end
+end
+subgraph I["react-dom@19.3.1_react@19.3.1"]
+subgraph J["node_modules"]
+subgraph K["react-dom"]
+L["client.js"]
+end
+end
+end
+subgraph P["@tanstack+react-query@5.104.5_@types+react@19.3.0_react@19.3.1"]
+subgraph Q["node_modules"]
+subgraph R["@tanstack"]
+subgraph S["react-query"]
+subgraph T["build"]
+subgraph U["legacy"]
+V["index.cjs"]
+end
+end
+end
+end
+end
+end
+subgraph W["@tanstack+react-query-devtools@5.104.5_@tanstack+react-query@5.104.5_@types+react@19.3._62e0000b3d1087b61fbc2b940e8adedc"]
+subgraph X["node_modules"]
+subgraph Y["@tanstack"]
+subgraph Z["react-query-devtools"]
+subgraph 10["build"]
+subgraph 11["legacy"]
+12["index.cjs"]
+end
+end
+end
+end
+end
+end
+subgraph 13["motion@14.6.0_react-dom@19.3.1_react@19.3.1__react@19.3.1"]
+subgraph 14["node_modules"]
+subgraph 15["motion"]
+subgraph 16["dist"]
+subgraph 17["cjs"]
+18["react.js"]
+end
+end
+end
+end
+end
+subgraph 1L["@radix-ui+react-slot@1.5.0_@types+react@19.3.0_react@19.3.1"]
+subgraph 1M["node_modules"]
+subgraph 1N["@radix-ui"]
+subgraph 1O["react-slot"]
+subgraph 1P["dist"]
+1Q["index.js"]
+end
+end
+end
+end
+end
+subgraph 1R["class-variance-authority@0.7.1"]
+subgraph 1S["node_modules"]
+subgraph 1T["class-variance-authority"]
+subgraph 1U["dist"]
+1V["index.js"]
+end
+end
+end
+end
+subgraph 1X["clsx@2.1.1"]
+subgraph 1Y["node_modules"]
+subgraph 1Z["clsx"]
+subgraph 20["dist"]
+21["clsx.js"]
+end
+end
+end
+end
+subgraph 22["tailwind-merge@3.7.0"]
+subgraph 23["node_modules"]
+subgraph 24["tailwind-merge"]
+subgraph 25["dist"]
+26["bundle-cjs.js"]
+end
+end
+end
+end
+subgraph 2A["lucide-react@1.61.0_@types+react@19.3.0_react@19.3.1"]
+subgraph 2B["node_modules"]
+subgraph 2C["lucide-react"]
+subgraph 2D["dist"]
+subgraph 2E["cjs"]
+2F["lucide-react.js"]
+end
+end
+end
+end
+end
+subgraph 2O["@testing-library+react@16.3.3_@testing-library+dom@10.4.2_@types+react-dom@19.3.0_@type_caf0c89dcd807677af52e2a43e70eff8"]
+subgraph 2P["node_modules"]
+subgraph 2Q["@testing-library"]
+subgraph 2R["react"]
+subgraph 2S["dist"]
+2T["index.js"]
+end
+end
+end
+end
+end
+subgraph 2U["vitest@5.0.5_@types+node@26.6.5_@vitest+coverage-v8@5.0.5_@vitest+ui@5.0.5_happy-dom@21_04eaf7044e6d709bde50152d7626184e"]
+subgraph 2V["node_modules"]
+subgraph 2W["vitest"]
+subgraph 2X["dist"]
+2Y["index.js"]
+end
+end
+end
+end
+subgraph 36["zod@4.6.7"]
+subgraph 37["node_modules"]
+subgraph 38["zod"]
+39["index.cjs"]
+end
+end
+end
+subgraph 3U["@tanstack+react-router-devtools@1.167.2_@tanstack+react-router@1.170.46_react-dom@19.3._d40592ca49659e60730b9bbe664ead48"]
+subgraph 3V["node_modules"]
+subgraph 3W["@tanstack"]
+subgraph 3X["react-router-devtools"]
+subgraph 3Y["dist"]
+subgraph 3Z["cjs"]
+40["index.cjs"]
+end
+end
+end
+end
+end
+end
+subgraph 58["zustand@5.0.16_@types+react@19.3.0_react@19.3.1_use-sync-external-store@1.7.0_react@19.3.1_"]
+subgraph 59["node_modules"]
+subgraph 5A["zustand"]
+5B["index.js"]
+5C["middleware.js"]
+end
+end
+end
+subgraph 8O["@testing-library+user-event@14.6.8_@testing-library+dom@10.4.2"]
+subgraph 8P["node_modules"]
+subgraph 8Q["@testing-library"]
+subgraph 8R["user-event"]
+subgraph 8S["dist"]
+subgraph 8T["cjs"]
+8U["index.js"]
+end
+end
+end
+end
+end
+end
+subgraph 9Q["@testing-library+jest-dom@7.0.1_@testing-library+dom@10.4.2_vitest@5.0.5"]
+subgraph 9R["node_modules"]
+subgraph 9S["@testing-library"]
+subgraph 9T["jest-dom"]
+9U["vitest.js"]
+end
+end
+end
+end
+end
+end
+2-->O
+2-->1D
+2-->4
+2-->D
+2-->H
+2-->L
+2-->M
+O-->1B
+O-->V
+O-->12
+O-->18
+O-->M
+1B-->V
+1D-->1G
+1D-->2K
+1D-->28
+1D-->D
+1G-->1I
+1I-->1K
+1I-->28
+1I-->M
+1K-->1W
+1K-->1Q
+1K-->1V
+1K-->M
+1W-->21
+1W-->26
+28-->29
+28-->2I
+29-->1K
+29-->1W
+29-->2G
+29-->2H
+29-->D
+29-->2F
+29-->18
+29-->H
+29-->M
+2G-->H
+2H-->H
+2I-->M
+2K-->2M
+2M-->28
+2M-->D
+2M-->M
+2N-->31
+2N-->3F
+2N-->1G
+2N-->2K
+2N-->D
+2N-->2T
+2N-->M
+2N-->2Y
+31-->33
+31-->3A
+31-->35
+31-->3C
+33-->35
+35-->39
+3C-->3D
+3C-->D
+3C-->M
+3F-->3H
+3F-->3J
+3F-->3L
+3F-->3M
+3F-->3N
+3F-->3P
+3F-->3R
+3H-->3J
+3J-->39
+3L-->M
+3M-->M
+3N-->1W
+3N-->3O
+3N-->M
+3O-->1W
+3O-->M
+3P-->1K
+3P-->3O
+3P-->3Q
+3P-->D
+3P-->M
+3Q-->1W
+3Q-->M
+3R-->1W
+3R-->D
+3R-->2F
+3R-->18
+3R-->M
+3T-->43
+3T-->D
+3T-->40
+3T-->M
+43-->45
+43-->47
+43-->4C
+45-->2F
+47-->49
+47-->4A
+47-->4C
+47-->4G
+47-->4H
+47-->28
+47-->H
+47-->M
+49-->D
+49-->H
+4A-->45
+4A-->4B
+4A-->M
+4B-->1W
+4B-->D
+4B-->18
+4B-->H
+4B-->M
+4C-->4D
+4C-->1K
+4C-->4F
+4C-->D
+4C-->M
+4D-->H
+4F-->M
+4G-->45
+4G-->4B
+4G-->M
+4H-->M
+4I-->4K
+4I-->51
+4I-->D
+4K-->4M
+4M-->4O
+4M-->4X
+4M-->5I
+4M-->28
+4M-->M
+4O-->4Q
+4O-->4R
+4O-->4T
+4O-->4U
+4T-->1W
+4T-->M
+4U-->4F
+4U-->M
+4X-->4Z
+4X-->53
+4X-->55
+4X-->54
+4X-->57
+4X-->5D
+4X-->5E
+4X-->5G
+4X-->5H
+4Z-->51
+51-->52
+52-->39
+53-->4Z
+53-->54
+53-->4O
+54-->55
+57-->5B
+57-->5C
+5D-->39
+5E-->53
+5E-->52
+5E-->V
+5E-->H
+5G-->53
+5G-->57
+5G-->5D
+5G-->5E
+5G-->5H
+5G-->52
+5G-->1K
+5G-->18
+5G-->H
+5G-->M
+5H-->5D
+5H-->1W
+5H-->M
+5I-->1W
+5I-->M
+5J-->5L
+5J-->51
+5J-->D
+5L-->5N
+5N-->4O
+5N-->5P
+5N-->1K
+5N-->28
+5N-->5V
+5N-->M
+5P-->5R
+5P-->5T
+5R-->H
+5T-->1K
+5T-->2F
+5T-->M
+5V-->5X
+5X-->5Z
+5X-->4O
+5X-->M
+5Z-->61
+5Z-->63
+5Z-->64
+63-->61
+63-->M
+64-->61
+64-->18
+64-->M
+65-->67
+65-->51
+65-->D
+67-->69
+69-->5I
+69-->D
+69-->18
+69-->M
+6A-->6C
+6A-->51
+6A-->D
+6C-->6E
+6E-->5Z
+6E-->4O
+6E-->1K
+6E-->28
+6E-->D
+6E-->M
+6F-->6H
+6F-->51
+6F-->D
+6H-->6J
+6J-->4O
+6J-->6K
+6J-->6M
+6J-->28
+6J-->M
+6K-->1W
+6K-->M
+6M-->1W
+6M-->18
+6M-->M
+6N-->6P
+6N-->D
+6P-->6R
+6R-->4O
+6R-->1K
+6R-->6K
+6R-->6S
+6R-->28
+6R-->D
+6R-->M
+6S-->1W
+6S-->M
+6T-->6V
+6T-->51
+6T-->D
+6V-->6X
+6X-->4O
+6X-->28
+6X-->M
+6Z-->3F
+6Z-->71
+6Z-->51
+6Z-->D
+71-->73
+73-->3F
+73-->1K
+73-->75
+73-->3Q
+73-->28
+73-->D
+73-->M
+75-->76
+75-->79
+75-->78
+76-->77
+76-->78
+76-->D
+76-->M
+77-->1W
+77-->M
+78-->M
+79-->1W
+79-->M
+7A-->7C
+7A-->7J
+7A-->51
+7A-->D
+7C-->7E
+7C-->7F
+7C-->7H
+7F-->3F
+7F-->39
+7H-->3F
+7H-->1W
+7H-->D
+7H-->M
+7J-->7L
+7L-->3F
+7L-->7C
+7L-->28
+7L-->7N
+7L-->D
+7L-->M
+7N-->7P
+7P-->3F
+7P-->7C
+7P-->D
+7P-->M
+7Q-->7S
+7Q-->51
+7Q-->D
+7S-->7U
+7U-->4O
+7U-->6S
+7U-->28
+7U-->M
+7V-->7X
+7V-->51
+7V-->D
+7X-->7Z
+7Z-->4O
+7Z-->28
+7Z-->M
+81-->31
+81-->83
+81-->51
+81-->D
+83-->85
+85-->31
+85-->87
+85-->3D
+85-->75
+85-->28
+85-->D
+85-->M
+87-->89
+87-->8B
+89-->H
+8B-->1W
+8B-->M
+8C-->8E
+8C-->51
+8C-->D
+8E-->8G
+8G-->31
+8G-->6M
+8G-->28
+8G-->M
+8I-->61
+8I-->2Y
+8J-->33
+8J-->2Y
+8K-->4R
+8K-->4U
+8K-->2T
+8K-->M
+8K-->2Y
+8L-->3H
+8L-->2Y
+8M-->5R
+8M-->2T
+8M-->2Y
+8N-->5T
+8N-->2T
+8N-->8U
+8N-->M
+8N-->2Y
+8V-->7E
+8V-->3F
+8V-->2Y
+8W-->7F
+8W-->2Y
+8X-->7H
+8X-->8Z
+8X-->2T
+8X-->8U
+8X-->M
+8X-->2Y
+8Z-->V
+8Z-->D
+8Z-->2T
+8Z-->M
+90-->89
+90-->2T
+90-->M
+90-->2Y
+91-->8B
+91-->2T
+91-->M
+91-->2Y
+92-->4Z
+92-->2Y
+93-->53
+93-->2Y
+94-->55
+94-->54
+94-->2Y
+95-->57
+95-->2T
+95-->2Y
+96-->5D
+96-->2Y
+97-->5E
+97-->V
+97-->2T
+97-->M
+97-->2Y
+98-->57
+98-->5G
+98-->8Z
+98-->V
+98-->2T
+98-->8U
+98-->M
+98-->2Y
+99-->6R
+99-->8Z
+99-->2T
+99-->M
+99-->2Y
+9A-->5N
+9A-->8Z
+9A-->2T
+9A-->8U
+9A-->M
+9A-->2Y
+9B-->69
+9B-->8Z
+9B-->2T
+9B-->M
+9B-->2Y
+9C-->1I
+9C-->8Z
+9C-->2T
+9C-->M
+9C-->2Y
+9D-->6E
+9D-->8Z
+9D-->2T
+9D-->M
+9D-->2Y
+9E-->6J
+9E-->8Z
+9E-->2T
+9E-->M
+9E-->2Y
+9F-->2M
+9F-->8Z
+9F-->2T
+9F-->M
+9F-->2Y
+9G-->6X
+9G-->8Z
+9G-->2T
+9G-->M
+9G-->2Y
+9H-->7U
+9H-->8Z
+9H-->2T
+9H-->M
+9H-->2Y
+9I-->7Z
+9I-->8Z
+9I-->2T
+9I-->M
+9I-->2Y
+9J-->8G
+9J-->31
+9J-->8Z
+9J-->2T
+9J-->M
+9J-->2Y
+9K-->52
+9K-->2Y
+9L-->51
+9L-->2Y
+9M-->1W
+9M-->2Y
+9N-->3D
+9N-->2Y
+9O-->2T
+9O-->M
+9O-->2Y
+9P-->9U
+9P-->2T
+9P-->2Y
+9V-->2G
+9V-->2T
+9V-->8U
+9V-->M
+9V-->2Y
+9W-->2H
+9W-->2T
+9W-->2Y
+9X-->4D
+9X-->2T
+9X-->2Y
+9Y-->1K
+9Y-->2T
+9Y-->M
+9Y-->2Y
+9Z-->6K
+9Z-->2T
+9Z-->M
+9Z-->2Y
+A0-->3O
+A0-->2T
+A0-->M
+A0-->2Y
+A1-->77
+A1-->2T
+A1-->M
+A1-->2Y
+A2-->4F
+A2-->2T
+A2-->M
+A2-->2Y
+A3-->3Q
+A3-->2T
+A3-->M
+A3-->2Y
+A4-->6S
+A4-->2T
+A4-->M
+A4-->2Y
+A5-->5I
+A5-->2T
+A5-->M
+A5-->2Y
+A6-->29
+A6-->8Z
+A6-->2T
+A6-->8U
+A6-->M
+A6-->2Y
+A7-->5X
+A7-->2T
+A7-->M
+A7-->2Y
+A8-->45
+A8-->2Y
+A9-->49
+A9-->2T
+A9-->M
+A9-->2Y
+AA-->47
+AA-->8Z
+AA-->2T
+AA-->M
+AA-->2Y
+AB-->4C
+AB-->8Z
+AB-->2T
+AB-->M
+AB-->2Y
+AC-->7P
+AC-->3F
+AC-->7C
+AC-->8Z
+AC-->2T
+AC-->8U
+AC-->M
+AC-->2Y
