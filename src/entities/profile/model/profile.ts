@@ -30,7 +30,7 @@ export const profile = {
   },
 
   rightNow: [
-    'Staff Engineer (IC4) at Wrike, enterprise features',
+    'Consulting and developing applications for business',
     'Shipping side projects with an AI-assisted workflow',
     'Learning Czech, aiming for A2',
   ],
@@ -55,13 +55,17 @@ export const profile = {
   hobbies: [
     {
       title: 'Games',
-      text: 'Escape from Tarkov, Albion Online, GTA5RP. Mostly here for the in-game economies — and occasionally the tooling around them.',
+      text: 'Kingdom Come: Deliverance, HumanitZ, The Long Dark, The Last of Us.',
     },
     {
       title: 'Outdoors',
       text: 'Camping and hiking with a two-person tent, still chasing the perfect sleeping setup.',
     },
     { title: 'Music', text: 'Making tracks with AI music tools like Suno.' },
+    {
+      title: 'Photo & Video',
+      text: 'Making beautiful photos and videos, then processing the stills and editing the footage.',
+    },
     {
       title: 'Languages',
       text: 'Russian, English, and Czech in progress after five-plus years in Prague.',

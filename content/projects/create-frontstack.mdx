@@ -1,0 +1,71 @@
+---
+title: 'create-frontstack'
+kind: 'side'
+kindLabel: 'Side project'
+tags: ['typescript', 'ai']
+summary: 'A zero-dependency CLI that scaffolds a production-ready React + TypeScript + Vite repo in one command: TanStack Router/Query, Zustand, shadcn/ui, Vitest, Playwright, Docker, plus agent skills and MCP servers.'
+lead: 'One command → a frontend repo I would actually start from. React, Vite, TanStack, Docker, tests, and the agent skills I use every day — with a CLI that has no runtime dependencies, so npx is instant.'
+stack: ['Node.js', 'React', 'TypeScript', 'Vite', 'TanStack', 'Docker']
+stackShort: 'Node CLI · React · Vite'
+role: 'Solo — spec, CLI, template'
+status: 'Published on npm'
+facts:
+  - label: 'Role'
+    value: 'Solo: spec, CLI, template'
+  - label: 'Published'
+    value: 'npm, MIT, v0.2.4'
+  - label: 'Stack'
+    value: 'Node.js CLI, React, Vite, TanStack'
+  - label: 'Runtime deps'
+    value: 'None — Node built-ins only'
+links:
+  - label: 'Source on GitHub'
+    url: 'https://github.com/HarryMtv/create-frontstack'
+  - label: 'Package on npm'
+    url: 'https://www.npmjs.com/package/create-frontstack'
+order: 7
+hasCaseStudy: true
+---
+
+<Columns>
+
+## Why
+
+Every new frontend I start wants the same pile: Vite 8, TanStack Router and Query, Zustand for UI state, shadcn, Vitest, Playwright, Docker, and the agent skills I already keep next to the code. Copy-pasting the last repo meant inheriting its product decisions. A scaffolder with zero runtime dependencies meant `npx` stays instant and the template stays mine.
+
+## What it does
+
+- `pnpm create frontstack my-app` — or `npm create` / `npx`
+- Interactive prompts, or `--skills=claude,agents` / `--no-skills` for CI
+- Copies a single-package template, restores npm-mangled dotfiles, substitutes the project name
+- Wires agent skills as symlinks (junction / copy on Windows) and mirrors `CLAUDE.md` as `AGENTS.md`
+
+</Columns>
+
+## How it's built
+
+<FlowDiagram
+  nodes={[
+    { title: 'npx / pnpm create', caption: 'create-frontstack my-app' },
+    { title: 'CLI', caption: 'Node built-ins only', tone: 'highlight' },
+    { title: 'template/', caption: 'Copy, rename, substitute', tone: 'accent' },
+    { title: 'New repo', caption: 'Ready for pnpm dev', tone: 'plain' },
+  ]}
+  targets={['React 19', 'TanStack', 'Docker']}
+  footer={[
+    'Vitest generation gate',
+    'Playwright E2E',
+    'MCP: shadcn · context7 · playwright',
+    'skills/ wired to .claude',
+  ]}
+/>
+
+The generated project is the unit under test: the suite runs the CLI into a temp dir and, when Node and Docker are available, exercises `pnpm check` and `pnpm build` on the output.
+
+## What I learned
+
+npm will eat your dotfiles. `.gitignore`, `.npmrc` and `.nvmrc` are stored as `_gitignore` / `_npmrc` / `_nvmrc` and renamed at copy time, because publish mangles them. Symlinks get the same treatment: `AGENTS.md` and the skills links are created after the copy, with a Windows junction and a plain-copy fallback, so the template itself never ships a symlink.
+
+Zero runtime dependencies is a product decision, not a purity flex. A scaffolder people run via `npx` cannot afford a cold install of its own graph. The CLI is Node built-ins: `fs`, `path`, `readline`, `process`.
+
+The template has to stay a project I would open tomorrow. This site is one of those repos — same Router, Query, Vite, Docker and skills layout. When the scaffold drifts from how I actually work, I feel it here first.

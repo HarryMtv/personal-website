@@ -35,7 +35,19 @@ export const projectFrontmatterSchema = z.object({
   status: z.string().optional(),
   facts: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   links: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
-  screenshotCaption: z.string(),
+  /**
+   * A screenshot's public path and intrinsic size (reserves its box before it
+   * loads). With a caption and no screenshot, the dashed placeholder stays.
+   * Omit both to show nothing.
+   */
+  screenshot: z
+    .object({
+      src: z.string().min(1),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+    })
+    .optional(),
+  screenshotCaption: z.string().min(1).optional(),
   order: z.number().int().nonnegative(),
   hasCaseStudy: z.boolean(),
 });

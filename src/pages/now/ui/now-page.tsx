@@ -25,10 +25,10 @@ export function NowPage() {
     <Window path={[{ label: 'now.md' }]} closeTo="/desktop">
       <div className="mx-auto flex max-w-[680px] flex-col gap-5 p-[clamp(24px,5vw,56px)]">
         <p className="text-muted m-0 font-mono text-[13px] font-medium">Updated {updated}</p>
-        <h1 className="font-display text-[40px]/1.05 m-0 font-extrabold tracking-[-0.02em]">
+        <h1 className="font-display m-0 text-[40px]/[1.05] font-extrabold tracking-[-0.02em]">
           What I&rsquo;m doing now
         </h1>
-        <ul className="text-[17px]/1.55 m-0 flex list-disc flex-col gap-3 pl-5">
+        <ul className="m-0 flex list-disc flex-col gap-3 pl-5 text-[17px]/[1.55]">
           {profile.now.items.map((item) => (
             <li key={item}>{item}</li>
           ))}

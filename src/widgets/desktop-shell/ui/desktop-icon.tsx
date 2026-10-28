@@ -49,7 +49,7 @@ export function DesktopIcon({ icon, index, label, className }: DesktopIconProps)
         <m.span
           variants={{ hover: {}, tap: {} }}
           className={cn(
-            'rounded-md px-[7px] py-0.5 font-sans text-[13px]/1.25 font-medium text-white [text-shadow:0_1px_2px_rgb(40_10_0/0.7)]',
+            'rounded-md px-[7px] py-0.5 font-sans text-[13px]/[1.25] font-medium text-white [text-shadow:0_1px_2px_rgb(40_10_0/0.7)]',
             // The active label becomes the blue pill (Link adds aria-current).
             'group-aria-[current=page]:bg-accent group-aria-[current=page]:[text-shadow:none]',
           )}

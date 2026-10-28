@@ -1,42 +1,121 @@
 ---
 title: 'Building a Telegram PM hub in five days with AI'
-summary: 'Day by day: from a technical spec to a phased plan, a multi-model setup, and a bot that talks to ClickUp, Wrike and Jira.'
-lead: 'A day-by-day log of going from a spec to a working bot that talks to ClickUp, Wrike and Jira — and what each model was actually good at.'
-# TODO(content): pin the real reading time and the publish date.
-readingMinutes: 6
+summary: 'From an old ClickUp feature request to a working bot for ClickUp, Wrike and Jira, in five days with a spec-first AI workflow.'
+lead: 'A day-by-day log of closing an old ClickUp feature request — a spec, two models, and a bot that talks to ClickUp, Wrike and Jira.'
+date: '2026-07-22'
+readingMinutes: 7
 source: 'Medium'
+canonicalUrl: 'https://medium.com/@i.m/closing-a-feature-request-with-ai-a-telegram-bot-for-clickup-wrike-and-jira-in-5-days-07658ad2411d'
 relatedProject: 'pm-telegram-hub'
 draft: false
 ---
 
-## Day 1 · Spec first
+One evening I stumbled on an old feature request in ClickUp. I never found a working solution for it online. That got me thinking: with AI, is it really that hard to close requests like this? Closing one improves a company's image and solves a real customer pain. So I decided to build it myself and see how long it would take.
 
-Before any code, I wrote a technical spec and turned it into a phased implementation plan with OpenSpec. Claude handled architecture and UI decisions; a second, cheaper model did the bulk implementation.
+## Day 1 · Beginning
 
-```ts
-interface TrackerAdapter {
-  getTask(id: string): Promise<Task>;
-  addComment(taskId: string, text: string): Promise<void>;
-  onTaskUpdated(cb: (e: TaskEvent) => void): Unsubscribe;
-}
-```
+I have development experience and no product experience, so the first thing I wanted was a feature set. I opened the ticket, scrolled through a few pages of user comments, and dropped all of it into Claude along with a link to the ClickUp API. After talking it through, we decided what belonged in the Telegram bot and what should go into a Telegram mini app. Then I asked it to write a product spec.
 
-[Why the adapters layer came first, and what it cost to keep it honest across three very different APIs.]
+Next I had to pick a stack. Here I do have experience:
 
-> [A pull quote — the one line you'd want someone to remember.]
+- TypeScript — my main stack, and it covers both backend and frontend.
+- Fastify — interchangeable here. I just happen to know it.
+- Supabase — a good fit for a small project, with solid data security. Any database would do.
+- Docker — worth naming up front. It tells the model the result has to be deployable, and it tends to add the boring pieces, like a `/health` handler, instead of forgetting them.
+- shadcn and Tailwind CSS — for the mini app UI.
+- Vite, ESLint and Prettier — the baseline for code I can still maintain.
 
-## Day 2 · [Title]
+That's the core. I left every other library to the model. For a reference setup on projects like this, I keep coming back to the [full-stack-fastapi-template](https://github.com/fastapi/full-stack-fastapi-template).
 
-[Section text]
+Then I merged the product spec with the stack and asked Claude for an architecture: layers, models, database tables. That's the technical spec.
 
-## Day 3 · [Title]
+I usually stop here and let it sink in.
 
-[Section text]
+> Lying in bed, I thought: why not extend this connector to other similar providers? That's how the adapters layer was born.
 
-## Day 4 · [Title]
+## Day 2 · Adapters
 
-[Section text]
+Supporting other clients is a lot of work when the architecture is built around a single provider. It is only hard once the code exists, and we didn't have any yet. I grabbed the API docs for the three closest providers — ClickUp, Wrike and Jira — added the technical spec, and asked Claude to rewrite the architecture for all three.
 
-## Day 5 · [Title]
+What came back was almost a new system: new database schemas, new relations, new models. The Telegram layer was the only part that stayed.
 
-[Section text]
+It felt ready to build. To be safe, I opened a fresh context and asked Claude to review the spec. I had Claude write the review prompt, too. That was the first security feedback I got. It hadn't come up earlier. I went through the comments, dropped the ones that don't matter for a project this small, and asked it to fix the spec for the ones that do.
+
+The spec was done enough to start. It doesn't cover every corner, and new details show up while you build, but it was enough to work from.
+
+## Day 3 · Development
+
+I don't have infinite tokens. The limits on a few ~$20 subscriptions are strict, so a mistake is expensive. I can't ask the model to rewrite the architecture from scratch every time: I would hit the cap, and on API pricing that gets costly for a company. Before any code, there has to be a plan.
+
+OpenSpec does that part. I ran it and asked it to turn the technical spec into a step-by-step implementation plan. While it worked, I set up the other thing the build needed: skills and MCP servers.
+
+Each of these tools eats context, and context eats the limits, so the list stayed short.
+
+Skills:
+
+- mattpocock/skills — small skills that cover the mistakes models usually make.
+- Vercel react-best-practices — for the Telegram mini app.
+- jezweb/claude-skills — only the Design & Frontend block: Tailwind v4 and shadcn/ui.
+- supabase/agent-skills — because the project uses Supabase.
+
+That is the minimum that keeps an agent from turning the code into mush.
+
+MCPs:
+
+- Shadcn MCP, because I use the component library.
+- Supabase MCP, for a direct database connection when running migrations and debugging.
+
+A provider MCP, ClickUp for example, is optional. The docs were enough. With a larger token budget both lists can grow. It is also worth asking Claude to write skills that match your own architecture.
+
+If you use several agents, keep the skills in `.agents/skills` and symlink them for the other providers, so there is one copy.
+
+By then the OpenSpec plan was ready. I read it and budgeted the limits. I asked it to split the mini app into its own plan: it is a large piece, and mostly independent.
+
+Then I restarted the terminal, checked that everything was picked up, and cleared the context. I started a fresh session on GLM-5.2, ran `/opsx:apply`, and went for coffee.
+
+I hit the limits, as expected. Two ways through that:
+
+- Wait. You keep the full context, which matters if the task stopped halfway and another model would not know what you were doing. You lose the time.
+- Hand off between phases. OpenSpec pauses at a milestone and asks whether to continue. Finish one phase and let a different model pick up the next — and lose the context.
+
+I was not in a hurry, so I continued the next day.
+
+## Day 4 · Mini app
+
+I started by asking GLM to keep going. After a while the first part was finished: a bot I could actually run. I filled in the environment variables and launched it. Authorization and token errors showed up immediately. Nothing subtle. I asked the model to cross-check the docs, which are not obvious for every provider. A few minutes later the tokens were wired up and it worked.
+
+What followed was a stretch of product quirks. I will not narrate each fix. This is what I added, and what showed up in use:
+
+- Cleaner buttons in the interface.
+- Subscriptions that apply only to my own tasks. By default the webhooks fire for the whole workspace.
+- Self-echo suppression, so my own actions don't notify me.
+- Comment fixes.
+- A reply option.
+
+There were a few more. In this mode it does not take long. Most of the errors were domain quirks, not architectural problems.
+
+With the bot settled, I moved to the mini app. Same flow: `apply` from OpenSpec, with Claude on the UI. Coffee, approve an operation when it asks, and come back the next day.
+
+## Day 5 · Deploy
+
+I launched the mini app and did the simple pass first: every view, the UI fixes, the toasts. Then I tested the behavior and added a few things:
+
+- Editing subscriptions.
+- Showing the task description.
+- Tweaks for Jira's webhook quirks.
+
+That was the stage. Next was how it behaves on a real host.
+
+I asked the model to write the Docker files for my VPS. It took the request literally and produced two applications. This is one app on one machine, so I asked it to serve the static files from that same host. It did.
+
+I deploy with Coolify. Connect the repo through the GitHub App, point it at the Dockerfile, and deploys run themselves. Set the environment variables. DNS is a separate article, and there are plenty of those.
+
+The result is a working, semi-production bot. It covers the original request, and it took almost no extra people and almost no company money.
+
+## Summary
+
+Five days. About $20 on Claude and $20 on GLM. With unlimited tokens and time, three days is plausible. I would not go lower. The pause between days is when you notice what the spec missed.
+
+I wanted to show the AI workflow for a small project end to end — which tools I actually use, more than a theory of how it should go. Some of it is probably suboptimal. Feature requests of this size can still be closed in a semi-automated way.
+
+The bot is [@pm_assist_tool_bot](https://t.me/pm_assist_tool_bot). The code is on [GitHub](https://github.com/HarryMtv/pm-telegram-hub). If you use ClickUp, Wrike or Jira, it might be useful. A week was not enough to test everything. If you find a gap, open an issue — I will try to fix it quickly.

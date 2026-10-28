@@ -15,9 +15,9 @@ export const mdxComponents: MDXComponents = {
   ),
   p: (props) => <p className="m-0 text-pretty" {...props} />,
   ul: (props) => <ul className="m-0 flex list-disc flex-col gap-2 pl-5" {...props} />,
-  li: (props) => <li className="text-ink-2 text-[17px]/1.5" {...props} />,
+  li: (props) => <li className="text-ink-2 text-[17px]/[1.5]" {...props} />,
   pre: (props) => (
-    <figure className="bg-code-bg text-[14px]/1.7 text-code-fg m-0 overflow-x-auto rounded-[10px] p-[18px] pr-5 font-mono">
+    <figure className="bg-code-bg text-code-fg m-0 overflow-x-auto rounded-[10px] p-[18px] pr-5 font-mono text-[14px]/[1.7]">
       <pre className="m-0" {...props} />
     </figure>
   ),
@@ -26,11 +26,15 @@ export const mdxComponents: MDXComponents = {
   a: ({ href, children }: { href?: string; children?: ReactNode }) => {
     if (href?.startsWith('/')) {
       return (
-        <Link to={href} className="text-accent underline-offset-2 hover:underline">
+        <Link to={href} className="text-accent underline underline-offset-2">
           {children}
         </Link>
       );
     }
-    return <ExternalLink href={href}>{children}</ExternalLink>;
+    return (
+      <ExternalLink href={href} className="underline">
+        {children}
+      </ExternalLink>
+    );
   },
 };

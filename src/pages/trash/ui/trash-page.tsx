@@ -6,7 +6,7 @@ export function TrashPage() {
   return (
     <Window path={[{ label: '.trash/' }]} closeTo="/desktop">
       <div className="mx-auto flex max-w-[640px] flex-col gap-4.5 p-[clamp(24px,5vw,56px)]">
-        <h1 className="font-display text-[40px]/1.05 m-0 font-extrabold tracking-[-0.02em]">
+        <h1 className="font-display m-0 text-[40px]/[1.05] font-extrabold tracking-[-0.02em]">
           Trash
         </h1>
         <ul className="m-0 flex list-none flex-col gap-2 p-0 font-mono text-[15px]">

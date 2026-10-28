@@ -46,7 +46,7 @@ export function CvDocument({ zoom }: { zoom: number }) {
         <section aria-label="Summary">
           <Section title="Summary" />
           {profile.summary.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)} className="text-ink-2 m-0 pb-1 text-[13px]/1.5">
+            <p key={paragraph.slice(0, 24)} className="text-ink-2 m-0 pb-1 text-[13px]/[1.5]">
               {paragraph}
             </p>
           ))}

@@ -5,7 +5,10 @@ import { pageTitle } from '@/shared/config/site';
 const head = () => ({
   meta: [
     { title: pageTitle('hobbies.md') },
-    { name: 'description', content: 'Games, outdoors, music and languages — off the clock.' },
+    {
+      name: 'description',
+      content: 'Games, outdoors, music, photo and languages — off the clock.',
+    },
   ],
 });
 

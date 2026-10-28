@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/shared/ui/button';
 import { Chip } from '@/shared/ui/chip';
 import { Placeholder } from '@/shared/ui/placeholder';
+import { Screenshot } from '@/shared/ui/screenshot';
 import type { Project } from '../model/project';
 
 /** The right-hand preview pane for the selected project. */
@@ -11,11 +12,15 @@ export function ProjectPreview({ project }: { project: Project }) {
       aria-label="Preview"
       className="border-ink/12 bg-card flex max-w-[400px] min-w-0 flex-1 basis-[320px] flex-col gap-4 border-l p-6 max-[760px]:max-w-none max-[760px]:border-t max-[760px]:border-l-0"
     >
-      <Placeholder ratio="4/3" caption={project.screenshotCaption} />
-      <h2 className="font-display text-[28px]/1.1 m-0 font-extrabold tracking-[-0.02em]">
+      {project.screenshot ? (
+        <Screenshot {...project.screenshot} caption={project.screenshotCaption} />
+      ) : project.screenshotCaption ? (
+        <Placeholder ratio="4/3" caption={project.screenshotCaption} />
+      ) : null}
+      <h2 className="font-display m-0 text-[28px]/[1.1] font-extrabold tracking-[-0.02em]">
         {project.title}
       </h2>
-      <p className="text-[15px]/1.55 text-ink-2 m-0">{project.summary}</p>
+      <p className="text-ink-2 m-0 text-[15px]/[1.55]">{project.summary}</p>
       <div className="flex flex-wrap gap-1.5">
         {project.stack.map((item) => (
           <Chip key={item}>{item}</Chip>

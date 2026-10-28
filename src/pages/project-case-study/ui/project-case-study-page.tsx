@@ -2,6 +2,7 @@ import { Link, getRouteApi } from '@tanstack/react-router';
 import { Columns, CaseStudyFacts, FlowDiagram } from '@/entities/project';
 import { Button } from '@/shared/ui/button';
 import { Placeholder } from '@/shared/ui/placeholder';
+import { Screenshot } from '@/shared/ui/screenshot';
 import { mdxComponents, Prose } from '@/shared/ui/mdx';
 import { Window } from '@/shared/ui/window';
 
@@ -31,10 +32,10 @@ export function ProjectCaseStudyPage() {
           >
             ← All projects
           </Link>
-          <h1 className="font-display m-0 text-[clamp(40px,6vw,68px)]/1 font-extrabold tracking-[-0.03em] text-balance">
+          <h1 className="font-display m-0 text-[clamp(40px,6vw,68px)]/[1] font-extrabold tracking-[-0.03em] text-balance">
             {project.title}
           </h1>
-          <p className="text-xl/1.55 text-ink-2 m-0 text-pretty">
+          <p className="text-ink-2 m-0 text-xl/[1.55] text-pretty">
             {project.lead ?? project.summary}
           </p>
           <div className="flex flex-wrap gap-3">
@@ -57,7 +58,11 @@ export function ProjectCaseStudyPage() {
         </section>
 
         <CaseStudyFacts project={project} />
-        <Placeholder ratio="16/8" caption={project.screenshotCaption} />
+        {project.screenshot ? (
+          <Screenshot {...project.screenshot} caption={project.screenshotCaption} />
+        ) : project.screenshotCaption ? (
+          <Placeholder ratio="16/8" caption={project.screenshotCaption} />
+        ) : null}
 
         <Prose className="mx-auto">
           <Content components={caseStudyComponents} />

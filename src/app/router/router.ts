@@ -20,6 +20,13 @@ export const router = createRouter({
   defaultErrorComponent: ErrorPage,
 });
 
+// Only a pathname change swaps the window. Search-only and same-URL
+// navigations (selection, filters, re-clicking the open window) keep it in
+// place. Same-URL navigations ignore a per-call `viewTransition`, hence here.
+router.subscribe('onBeforeNavigate', ({ pathChanged }) => {
+  if (!pathChanged) router.shouldViewTransition = false;
+});
+
 // Register the router for end-to-end type safety.
 declare module '@tanstack/react-router' {
   interface Register {

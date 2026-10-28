@@ -9,7 +9,7 @@ export function WritingPage() {
   return (
     <Window path={[{ label: 'writing/' }]} closeTo="/desktop">
       <div className="mx-auto flex max-w-[760px] flex-col gap-6 p-[clamp(24px,5vw,56px)]">
-        <h1 className="font-display text-[40px]/1.05 m-0 font-extrabold tracking-[-0.02em]">
+        <h1 className="font-display m-0 text-[40px]/[1.05] font-extrabold tracking-[-0.02em]">
           Writing
         </h1>
         {posts.length > 0 ? (

@@ -83,7 +83,7 @@ export function ContactForm({ transport }: { transport?: ContactTransport }) {
         className="flex flex-1 flex-col items-start justify-center gap-4 p-8"
         data-testid="contact-success"
       >
-        <p className="text-lg/1.6 text-ink-2 m-0">
+        <p className="text-ink-2 m-0 text-lg/[1.6]">
           {isMailtoMode
             ? 'Your mail app should open now.'
             : "Message sent — I'll reply within a few days."}
@@ -162,7 +162,7 @@ export function ContactForm({ transport }: { transport?: ContactTransport }) {
         placeholder="Hi Igor, …"
         value={draft.message}
         onChange={(event) => handleChange('message', event.target.value)}
-        className="text-base/1.6 text-ink min-h-[260px] flex-1 resize-y border-0 bg-transparent p-5 outline-none"
+        className="text-ink min-h-[260px] flex-1 resize-y border-0 bg-transparent p-5 text-base/[1.6] outline-none"
       />
       {errors.message ? (
         // Announced via focus + aria-describedby, same as the field errors.

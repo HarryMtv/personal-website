@@ -15,16 +15,17 @@ describe('post registry', () => {
     const loaded = await loadPost('telegram-pm-hub-in-5-days');
     expect(loaded.Content).toBeTypeOf('function');
     const headings = loaded.tableOfContents.filter((item) => item.depth === 2);
-    expect(headings).toHaveLength(5);
+    expect(headings).toHaveLength(6);
     expect(headings.map((item) => item.value)).toEqual([
-      'Day 1 · Spec first',
-      'Day 2 · [Title]',
-      'Day 3 · [Title]',
-      'Day 4 · [Title]',
-      'Day 5 · [Title]',
+      'Day 1 · Beginning',
+      'Day 2 · Adapters',
+      'Day 3 · Development',
+      'Day 4 · Mini app',
+      'Day 5 · Deploy',
+      'Summary',
     ]);
     // rehype-slug derives ids from the heading text ("·" becomes a separator).
-    expect(headings[0].id).toBe('day-1--spec-first');
+    expect(headings[0].id).toBe('day-1--beginning');
   });
 
   it('declares its related project slug', () => {
