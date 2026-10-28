@@ -48,6 +48,41 @@ function Probe({ ids }: { ids: string[] }) {
   );
 }
 
+/** Simulates scroll geometry; returns a restore function. */
+function stubScrollGeometry({
+  innerHeight,
+  scrollY,
+  scrollHeight,
+}: {
+  innerHeight: number;
+  scrollY: number;
+  scrollHeight: number;
+}) {
+  const originals = [
+    { target: window, key: 'innerHeight' },
+    { target: window, key: 'scrollY' },
+    { target: document.documentElement, key: 'scrollHeight' },
+  ].map(({ target, key }) => ({
+    target,
+    key,
+    descriptor: Object.getOwnPropertyDescriptor(target, key),
+  }));
+  Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => innerHeight });
+  Object.defineProperty(window, 'scrollY', { configurable: true, get: () => scrollY });
+  Object.defineProperty(document.documentElement, 'scrollHeight', {
+    configurable: true,
+    get: () => scrollHeight,
+  });
+  return () => {
+    for (const { target, key, descriptor } of originals) {
+      // Inherited getters have no own descriptor — deleting our shadow
+      // restores them.
+      if (descriptor) Object.defineProperty(target, key, descriptor);
+      else Reflect.deleteProperty(target, key);
+    }
+  };
+}
+
 describe('useScrollSpy', () => {
   it('starts on the first id', () => {
     const { getByTestId } = render(<Probe ids={['a', 'b']} />);
@@ -94,10 +129,14 @@ describe('useScrollSpy', () => {
     window.location.hash = '#a';
     const { getByTestId, rerender } = render(<Probe ids={['a', 'b']} />);
 
-    // The user scrolled (the observer reports b) after a TOC visit left #a.
     const callback = MockIntersectionObserver.callbacks[0];
     const observer = new MockIntersectionObserver(vi.fn());
     const instancesAfterMount = MockIntersectionObserver.instances.length;
+    // The TOC visit left #a; the user then scrolls (wheel) and the observer
+    // reports b.
+    act(() => {
+      window.dispatchEvent(new WheelEvent('wheel'));
+    });
     act(() => {
       callback([entry('b', true)], observer);
     });
@@ -109,6 +148,56 @@ describe('useScrollSpy', () => {
     expect(getByTestId('active')).toHaveTextContent('b');
     expect(MockIntersectionObserver.instances).toHaveLength(instancesAfterMount);
 
+    window.location.hash = '';
+    vi.unstubAllGlobals();
+  });
+
+  it('keeps a hash-pinned section until the user scrolls', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+    MockIntersectionObserver.callbacks = [];
+    MockIntersectionObserver.instances = [];
+    window.location.hash = '#b';
+    const { getByTestId } = render(<Probe ids={['a', 'b']} />);
+
+    const callback = MockIntersectionObserver.callbacks[0];
+    const observer = new MockIntersectionObserver(vi.fn());
+    // The anchor jump lands at the document bottom, so an earlier heading
+    // intersects the top zone on the next frame — the pin must hold.
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+
+    // The reader's own scroll lifts the pin; the observer wins again.
+    act(() => {
+      window.dispatchEvent(new WheelEvent('wheel'));
+    });
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('a');
+
+    window.location.hash = '';
+    vi.unstubAllGlobals();
+  });
+
+  it('activates the last section at the bottom of the page', () => {
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+    MockIntersectionObserver.callbacks = [];
+    MockIntersectionObserver.instances = [];
+    const restore = stubScrollGeometry({ innerHeight: 800, scrollY: 1200, scrollHeight: 2000 });
+    const { getByTestId } = render(<Probe ids={['a', 'b']} />);
+
+    // Earlier headings fill the top zone at the bottom of a long page, but
+    // the last section can never reach it — it must win there.
+    const callback = MockIntersectionObserver.callbacks[0];
+    const observer = new MockIntersectionObserver(vi.fn());
+    act(() => {
+      callback([entry('a', true)], observer);
+    });
+    expect(getByTestId('active')).toHaveTextContent('b');
+
+    restore();
     window.location.hash = '';
     vi.unstubAllGlobals();
   });
