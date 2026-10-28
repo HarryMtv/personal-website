@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export { ContentError } from '@/shared/lib/content-error';
+
 export const PROJECT_KINDS = ['side', 'work', 'experiment'] as const;
 export type ProjectKind = (typeof PROJECT_KINDS)[number];
 
@@ -43,14 +45,3 @@ export const projectFrontmatterSchema = z.object({
 export type ProjectFrontmatter = z.infer<typeof projectFrontmatterSchema>;
 
 export type Project = ProjectFrontmatter & { slug: string };
-
-/** Error naming the offending content file, thrown by the registry. */
-export class ContentError extends Error {
-  constructor(
-    public readonly file: string,
-    cause: z.ZodError,
-  ) {
-    super(`Invalid frontmatter in ${file}: ${cause.message}`, { cause });
-    this.name = 'ContentError';
-  }
-}

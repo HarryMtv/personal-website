@@ -2,6 +2,8 @@ import type { MDXContent } from 'mdx/types';
 import { z } from 'zod';
 import type { TocItem } from '../api/toc';
 
+export { ContentError } from '@/shared/lib/content-error';
+
 export const postFrontmatterSchema = z.object({
   title: z.string().min(1),
   summary: z.string().min(1),
@@ -22,14 +24,4 @@ export interface LoadedPost {
   /** The compiled MDX body. */
   Content: MDXContent;
   tableOfContents: TocItem[];
-}
-
-export class ContentError extends Error {
-  constructor(
-    public readonly file: string,
-    cause: z.ZodError,
-  ) {
-    super(`Invalid frontmatter in ${file}: ${cause.message}`, { cause });
-    this.name = 'ContentError';
-  }
 }

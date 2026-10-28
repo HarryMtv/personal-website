@@ -1,9 +1,6 @@
 import { Link } from '@tanstack/react-router';
-import type { Project } from '@/entities/project';
-import { ProjectPreview } from '@/entities/project';
-import { ProjectRow } from '@/entities/project';
-import { FilterSidebar } from '@/features/filter-projects';
-import type { ProjectExplorerSearch } from '@/features/filter-projects';
+import { ProjectPreview, ProjectRow, type Project } from '@/entities/project';
+import { FilterSidebar, type ProjectExplorerSearch } from '@/features/filter-projects';
 
 interface ProjectExplorerProps {
   projects: Project[];
