@@ -22,7 +22,9 @@ describe('AboutPage', () => {
   it('shows the Right now aside with the OPEN TO block', async () => {
     await renderWithRouter(<AboutPage />);
     expect(screen.getByRole('heading', { name: /right now/i })).toBeInTheDocument();
-    expect(screen.getByText(/consulting and developing applications for business/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/consulting and developing applications for business/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/open to/i)).toBeInTheDocument();
   });
 });

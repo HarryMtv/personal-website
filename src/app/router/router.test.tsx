@@ -107,7 +107,9 @@ describe('router integration', () => {
 
   it('renders the create-frontstack case study', async () => {
     await renderApp('/projects/create-frontstack');
-    expect(screen.getByRole('heading', { level: 1, name: 'create-frontstack' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'create-frontstack' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /source on github/i })).toHaveAttribute(
       'href',
       'https://github.com/HarryMtv/create-frontstack',
