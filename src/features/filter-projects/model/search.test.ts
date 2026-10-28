@@ -14,7 +14,11 @@ describe('projectExplorerSearchSchema', () => {
 
   it('keeps valid filters and selection', () => {
     expect(
-      projectExplorerSearchSchema.parse({ kind: 'work', tag: 'typescript', selected: 'distill' }),
-    ).toEqual({ kind: 'work', tag: 'typescript', selected: 'distill' });
+      projectExplorerSearchSchema.parse({
+        kind: 'work',
+        tag: 'typescript',
+        selected: 'telegram-content-engine',
+      }),
+    ).toEqual({ kind: 'work', tag: 'typescript', selected: 'telegram-content-engine' });
   });
 });

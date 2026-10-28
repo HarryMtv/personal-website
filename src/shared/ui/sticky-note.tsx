@@ -21,7 +21,7 @@ export function StickyNote({
       data-slot="sticky-note"
       style={{ transform: `rotate(${rotate}deg)` }}
       className={cn(
-        'bg-highlight shadow-note flex flex-col gap-1.5 p-5 pb-6.5 font-sans text-base/1.5 font-medium',
+        'bg-highlight shadow-note flex flex-col gap-1.5 p-5 pb-6.5 font-sans text-base/[1.5] font-medium',
         className,
       )}
       {...props}

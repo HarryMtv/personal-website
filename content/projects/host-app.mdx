@@ -1,0 +1,53 @@
+---
+title: 'Host app'
+kind: 'work'
+kindLabel: 'Work · Wrike'
+tags: ['typescript']
+summary: 'The host shell for Wrike microfrontends. A deploy writes the app version to Consul; the URL decides which app to load, and only that version''s JS chunks are fetched and mounted with createElement.'
+lead: 'Wrike''s UI is many apps on one page. Host app is the shell: the URL says which app this route is, Consul says which version is deployed, and only those JS chunks are downloaded and mounted with createElement.'
+stack: ['React', 'TypeScript', 'Consul']
+stackShort: 'React · Consul · chunks'
+role: 'Staff Software Engineer'
+status: 'Shipped'
+facts:
+  - label: 'Role'
+    value: 'Staff Software Engineer'
+  - label: 'Versions'
+    value: 'Written to Consul on deploy'
+  - label: 'Routing'
+    value: 'The URL picks the app'
+  - label: 'Mount'
+    value: 'JS chunks via createElement'
+order: 4
+hasCaseStudy: true
+---
+
+<Columns>
+
+## Why
+
+The product is not one bundle. Reporting, Table View, Budgeting and the rest ship as their own apps, and a page should load the one the route is actually showing. Pulling every app up front would make the host pay for code the URL never asked for.
+
+## What it does
+
+- Each app is deployed on its own, and the version that went out is written to Consul
+- The URL decides which app this route needs
+- The host reads that version from Consul and downloads only its JS chunks
+- The remote app is mounted with `createElement`, not copied into the host bundle
+
+</Columns>
+
+## How it's built
+
+<FlowDiagram
+  nodes={[
+    { title: 'URL', caption: 'Which app this route is' },
+    { title: 'Consul', caption: 'The deployed version', tone: 'highlight' },
+    { title: 'JS chunks', caption: 'Only that version', tone: 'accent' },
+    { title: 'createElement', caption: 'Mount it in the host', tone: 'plain' },
+  ]}
+  targets={[]}
+  footer={['Deploy writes the version', 'URL chooses the app', 'Unused apps stay unloaded']}
+/>
+
+The host stays thin. It does not own the feature code. It resolves a route to an app, asks Consul which build is current, fetches the chunks for that build, and renders them. A new deploy is a new version in Consul, so the next load of that URL picks up the new chunks without a new host release.

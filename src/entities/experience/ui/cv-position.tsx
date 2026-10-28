@@ -19,7 +19,7 @@ export function CvPosition({ position }: { position: Position }) {
           {position.url.replace('https://', '')}
         </a>
       ) : null}
-      <ul className="m-0 ml-4 list-disc pt-1 text-[13px]/1.5">
+      <ul className="m-0 ml-4 list-disc pt-1 text-[13px]/[1.5]">
         {position.highlights.map((highlight, index) => (
           <li key={index}>
             {highlight.label ? <strong>{highlight.label}: </strong> : null}

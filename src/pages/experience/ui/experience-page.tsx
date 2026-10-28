@@ -10,7 +10,7 @@ export function ExperiencePage() {
     <Window path={[{ label: 'experience.md' }]} closeTo="/desktop">
       <div className="mx-auto flex max-w-[760px] flex-col gap-7 p-[clamp(24px,5vw,56px)]">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h1 className="font-display text-[40px]/1.05 m-0 font-extrabold tracking-[-0.02em]">
+          <h1 className="font-display m-0 text-[40px]/[1.05] font-extrabold tracking-[-0.02em]">
             Experience
           </h1>
           <div className="flex flex-wrap gap-3">

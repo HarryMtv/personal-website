@@ -13,8 +13,8 @@ export function PostCard({ post }: { post: Post }) {
       <span className="text-muted font-mono text-xs font-medium">
         {[post.source, formatDate(post.date)].filter(Boolean).join(' · ')}
       </span>
-      <span className="font-display text-2xl/1.2 text-ink font-bold">{post.title}</span>
-      <span className="text-[15px]/1.55 text-ink-2">{post.summary}</span>
+      <span className="font-display text-ink text-2xl/[1.2] font-bold">{post.title}</span>
+      <span className="text-ink-2 text-[15px]/[1.55]">{post.summary}</span>
       <span className="text-accent text-[15px] font-semibold">Read post →</span>
     </Link>
   );

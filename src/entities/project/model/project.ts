@@ -35,7 +35,12 @@ export const projectFrontmatterSchema = z.object({
   status: z.string().optional(),
   facts: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
   links: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
-  screenshotCaption: z.string(),
+  /**
+   * Public path of a screenshot. With a caption and no path, the dashed
+   * placeholder stays. Omit both to show nothing.
+   */
+  screenshot: z.string().min(1).optional(),
+  screenshotCaption: z.string().min(1).optional(),
   order: z.number().int().nonnegative(),
   hasCaseStudy: z.boolean(),
 });

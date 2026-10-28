@@ -34,7 +34,7 @@ export function Timeline({ positions }: { positions: Position[] }) {
               {position.title} · {position.company}
             </h2>
             <span className="text-muted-2 font-mono text-xs">{position.location}</span>
-            <p className="text-[15px]/1.6 text-ink-2 m-0">{position.summary}</p>
+            <p className="text-ink-2 m-0 text-[15px]/[1.6]">{position.summary}</p>
           </div>
         </m.li>
       ))}

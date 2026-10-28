@@ -6,14 +6,22 @@ const projects = getProjects();
 
 describe('filterProjects', () => {
   it('returns everything for kind all without a tag', () => {
-    expect(filterProjects(projects, { kind: 'all' })).toHaveLength(4);
+    expect(filterProjects(projects, { kind: 'all' })).toHaveLength(7);
   });
 
   it('filters by kind', () => {
     const side = filterProjects(projects, { kind: 'side' });
-    expect(side.map((project) => project.slug)).toEqual(['pm-telegram-hub', 'distill']);
+    expect(side.map((project) => project.slug)).toEqual([
+      'pm-telegram-hub',
+      'telegram-content-engine',
+      'create-frontstack',
+    ]);
     const work = filterProjects(projects, { kind: 'work' });
-    expect(work.map((project) => project.slug)).toEqual(['universal-tree']);
+    expect(work.map((project) => project.slug)).toEqual([
+      'table-view',
+      'host-app',
+      'qa-automation-engine',
+    ]);
   });
 
   it('filters by tag', () => {
@@ -23,13 +31,15 @@ describe('filterProjects', () => {
 
   it('combines kind and tag with AND', () => {
     expect(filterProjects(projects, { kind: 'experiment', tag: 'telegram' })).toEqual([]);
-    expect(filterProjects(projects, { kind: 'side', tag: 'ai' })).toHaveLength(2);
+    expect(filterProjects(projects, { kind: 'side', tag: 'ai' })).toHaveLength(3);
   });
 });
 
 describe('resolveSelected', () => {
   it('picks the matching project', () => {
-    expect(resolveSelected(projects, 'distill')?.slug).toBe('distill');
+    expect(resolveSelected(projects, 'telegram-content-engine')?.slug).toBe(
+      'telegram-content-engine',
+    );
   });
 
   it('falls back to the first filtered project', () => {

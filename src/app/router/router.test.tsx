@@ -59,15 +59,38 @@ describe('router integration', () => {
     expect(getProjectBySlug(post?.relatedProject ?? '')).toBeDefined();
   });
 
-  it('filters the explorer from the URL (?kind=work shows 1 row)', async () => {
+  it('filters the explorer from the URL (?kind=work shows the Wrike rows)', async () => {
     await renderApp('/projects?kind=work');
     const rows = document.querySelectorAll('a[data-selected]');
-    expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent('universal-tree');
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toHaveTextContent('table-view');
+    expect(rows[1]).toHaveTextContent('host-app');
+    expect(rows[2]).toHaveTextContent('qa-automation-engine');
+  });
+
+  it('renders the Table View case study', async () => {
+    await renderApp('/projects/table-view');
+    expect(screen.getByRole('heading', { level: 1, name: 'Table View' })).toBeInTheDocument();
+    expect(screen.getByText(/Wrike Resource/)).toBeInTheDocument();
+    expect(screen.getAllByText(/100k\+ rows/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders the Host app case study', async () => {
+    await renderApp('/projects/host-app');
+    expect(screen.getByRole('heading', { level: 1, name: 'Host app' })).toBeInTheDocument();
+    expect(screen.getByText(/asks Consul which build is current/)).toBeInTheDocument();
+  });
+
+  it('renders the QA Automation Engine case study', async () => {
+    await renderApp('/projects/qa-automation-engine');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'QA Automation Engine' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/30,000\+ tests live in the framework/)).toBeInTheDocument();
   });
 
   it('shows 404.md for a project without a case study', async () => {
-    await renderApp('/projects/distill');
+    await renderApp('/projects/splat-tours');
     expect(screen.getByText(/this file doesn.t exist/i)).toBeInTheDocument();
   });
 
@@ -82,14 +105,38 @@ describe('router integration', () => {
     );
   });
 
+  it('renders the create-frontstack case study', async () => {
+    await renderApp('/projects/create-frontstack');
+    expect(screen.getByRole('heading', { level: 1, name: 'create-frontstack' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /source on github/i })).toHaveAttribute(
+      'href',
+      'https://github.com/HarryMtv/create-frontstack',
+    );
+    expect(screen.getByText('CLI')).toBeInTheDocument();
+    expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
+  });
+
+  it('renders the telegram content engine case study', async () => {
+    await renderApp('/projects/telegram-content-engine');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Telegram Content Engine' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /source on github/i })).toHaveAttribute(
+      'href',
+      'https://github.com/HarryMtv/telegram-content-engine',
+    );
+    expect(screen.getByText('RAG draft')).toBeInTheDocument();
+    expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
+  });
+
   it('renders the post with its CONTENTS nav and footer links', async () => {
     await renderApp('/writing/telegram-pm-hub-in-5-days');
     expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /day 1 · spec first/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /day 1 · beginning/i })).toHaveAttribute(
       'href',
-      '#day-1--spec-first',
+      '#day-1--beginning',
     );
-    expect(screen.getByText(/6 min read/i)).toBeInTheDocument();
+    expect(screen.getByText(/7 min read/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /see the project/i })).toHaveAttribute(
       'href',
       '/projects/pm-telegram-hub',
@@ -108,11 +155,13 @@ describe('router integration', () => {
   it('falls back gracefully on invalid project search params', async () => {
     await renderApp('/projects?kind=bogus&tag=invalid');
     const allRows = document.querySelectorAll('a[data-selected]');
-    expect(allRows).toHaveLength(4);
+    expect(allRows).toHaveLength(7);
   });
 
   it('restores valid project deep links from the URL', async () => {
-    await renderApp('/projects?kind=side&selected=distill');
-    expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent('Distill');
+    await renderApp('/projects?kind=side&selected=telegram-content-engine');
+    expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent(
+      'Telegram Content Engine',
+    );
   });
 });

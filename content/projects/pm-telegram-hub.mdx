@@ -24,7 +24,8 @@ links:
     url: 'https://t.me/pm_assist_tool_bot'
   - label: 'Source on GitHub'
     url: 'https://github.com/HarryMtv/pm-telegram-hub'
-screenshotCaption: '[Screenshots: chat notification + mini app task view, side by side]'
+screenshot: '/images/pm-telegram-hub.png'
+screenshotCaption: 'The mini app — connect Jira, Wrike and ClickUp, then read them in one inbox.'
 order: 1
 hasCaseStudy: true
 ---
@@ -63,6 +64,10 @@ ClickUp users had been asking for a Telegram integration for years, and the feat
 
 ## What I learned
 
-[Two or three honest takeaways — e.g. what the adapters abstraction got right, where the AI workflow needed a human, what you'd do differently.]
+The adapters layer was cheap only because it existed before any code. Asking for ClickUp, Wrike and Jira together rewrote the schemas, relations and models, and the Telegram layer was the only part that survived. Doing that after the first provider was already built would have spent the token budget on a rewrite.
+
+The workflow still needed a person. Security comments didn't show up until I asked for a review in a fresh context. The product rules weren't in the API docs either: webhooks fire for the whole workspace, your own actions echo back to you, and Jira's webhooks don't behave like the other two. Docker came back as two applications until I said this is one app on one host.
+
+I wouldn't skip the pauses between days. The adapters idea showed up away from the keyboard, and stopping at a phase was how I stayed inside the subscription limits. With unlimited tokens I might finish in three days. I wouldn't try to do it in one sitting.
 
 The full story is in the build log: [Building a Telegram PM hub in five days with AI](/writing/telegram-pm-hub-in-5-days).

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link, getRouteApi } from '@tanstack/react-router';
 import { flattenToc } from '@/entities/post';
 import { formatDate } from '@/shared/lib/format-date';
+import { ExternalLink } from '@/shared/ui/external-link';
 import { mdxComponents, Prose } from '@/shared/ui/mdx';
 import { Window } from '@/shared/ui/window';
 import { TableOfContents, useScrollSpy } from '@/features/reading-toc';
@@ -26,11 +27,19 @@ export function PostPage() {
         <TableOfContents items={toc} activeId={activeId} />
         <Prose className="flex-1">
           <p className="text-muted m-0 font-mono text-[13px] font-medium">
-            {[formatDate(post.date), post.source && `also on ${post.source}`]
-              .filter(Boolean)
-              .join(' · ')}
+            {formatDate(post.date)}
+            {post.source ? (
+              <>
+                {' · also on '}
+                {post.canonicalUrl ? (
+                  <ExternalLink href={post.canonicalUrl}>{post.source}</ExternalLink>
+                ) : (
+                  post.source
+                )}
+              </>
+            ) : null}
           </p>
-          <h1 className="font-display text-[clamp(36px,5vw,54px)]/1.05 m-0 font-extrabold tracking-[-0.03em] text-balance">
+          <h1 className="font-display m-0 text-[clamp(36px,5vw,54px)]/[1.05] font-extrabold tracking-[-0.03em] text-balance">
             {post.title}
           </h1>
           <p className="text-ink-3 m-0 text-[21px]">{post.lead}</p>

@@ -7,6 +7,6 @@ test('an unknown path opens the 404.md window', async ({ page }) => {
 });
 
 test('a project without a case study is a 404', async ({ page }) => {
-  await page.goto('/projects/distill');
+  await page.goto('/projects/splat-tours');
   await expect(page.getByText(/this file doesn.t exist/i)).toBeVisible();
 });

@@ -1,0 +1,69 @@
+---
+title: 'Telegram Content Engine'
+kind: 'side'
+kindLabel: 'Side project'
+tags: ['typescript', 'telegram', 'ai']
+summary: 'A retrieval-augmented editorial pipeline for a Telegram channel. Cohere embeddings and pgvector cluster tech sources across English and Russian; DeepSeek drafts only from the retrieved story, then a fact-check compares the post to the source text. Nothing publishes until I approve it.'
+lead: 'The model is the last step. Sources are embedded, clustered and retrieved first — then DeepSeek writes a Telegram post from that story, and a separate pass checks the draft against the original text.'
+stack: ['TypeScript', 'pgvector', 'DeepSeek', 'Cohere', 'PostgreSQL']
+stackShort: 'RAG · pgvector · DeepSeek'
+role: 'Solo — design, pipeline, bot'
+status: 'Private build'
+facts:
+  - label: 'Role'
+    value: 'Solo: design, pipeline, bot'
+  - label: 'Retrieval'
+    value: 'Cohere embeddings, pgvector 1024d'
+  - label: 'Generation'
+    value: 'DeepSeek, grounded in the story'
+  - label: 'Editorial'
+    value: 'Human approval in Telegram'
+links:
+  - label: 'Source on GitHub'
+    url: 'https://github.com/HarryMtv/telegram-content-engine'
+order: 2
+hasCaseStudy: true
+---
+
+<Columns>
+
+## Why
+
+A channel that reposts whatever an LLM just read will double-publish the same story in English and Russian, and it will invent the details it did not retrieve. I wanted the opposite: one story, retrieved from the sources that actually reported it, drafted only from those sources, and held until I say publish.
+
+## What it does
+
+- Watches Hugging Face papers, GitHub Trending, Hacker News, Reddit, RSS and Telegram
+- Embeds each item with Cohere `embed-multilingual-v3.0` (1024d) and clusters English and Russian into one story by cosine similarity in pgvector
+- Scores what survives: hard filters, vector similarity, source trust, freshness, then an LLM triage against the channel constitution
+- Diversifies the batch with maximal marginal relevance, so near-duplicates do not fill the day
+- Extracts a FactSheet from the retrieved text, drafts the post with DeepSeek, and fact-checks the draft against the source
+- Hands me the batch in Telegram: publish, edit, rewrite with the thinking model, or reject with a reason that retunes trust and weights
+
+</Columns>
+
+## How it's built
+
+<FlowDiagram
+  nodes={[
+    { title: 'Sources', caption: 'Papers, HN, RSS, Telegram' },
+    { title: 'pgvector', caption: 'Embed, cluster, retrieve', tone: 'highlight' },
+    { title: 'RAG draft', caption: 'DeepSeek + fact-check', tone: 'accent' },
+    { title: 'Editor', caption: 'Approve in Telegram', tone: 'plain' },
+  ]}
+  targets={['Publish', 'Rewrite', 'Reject']}
+  footer={[
+    'Resolver · Scout · Analyst',
+    'Cheap model for triage, thinking model for rewrites',
+    'Shadow mode before any autopublish',
+    'Monthly token budget with a hard cap',
+  ]}
+/>
+
+Five processes share one Postgres: an API and the editorial bot, a light worker for the funnel, a scheduler, a GramJS worker for read-only channel metrics, and a sandbox for the agents. Resolver looks up the primary source behind a Telegram lead. Scout hunts trends the sources are missing. Analyst reads rejections and engagement and proposes changes to the channel constitution. Autopublish stays off until a shadow mode agrees with me, and a kill switch drops the queue.
+
+## What I learned
+
+Retrieval has to happen before a sentence exists. If the draft is not tied to a retrieved story and a FactSheet, the fact-check has nothing to compare against, and "grounded" is just a prompt instruction. Cross-lingual embeddings were the dedup: the same paper in English and a Russian write-up is one story, or the channel posts it twice.
+
+The cheap model does the volume — triage, FactSheets, first drafts. The thinking model is reserved for "rewrite better" and the agent loops. A monthly cap makes that split a product rule, not a hope. Rejection reasons are part of the loop too: a no can lower a source's trust, change score weights, or extend the blacklist, instead of vanishing into chat history.

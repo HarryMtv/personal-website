@@ -9,6 +9,7 @@ import { projectFrontmatterSchema, type Project } from '../model/project';
  */
 
 // Eager frontmatter for the explorer; lazy default exports for case studies.
+// The glob is the registry: each content/projects/<slug>.mdx is picked up here.
 const frontmatterModules = import.meta.glob<{ frontmatter: unknown }>('/content/projects/*.mdx', {
   eager: true,
   import: 'frontmatter',

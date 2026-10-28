@@ -23,7 +23,7 @@ describe('ProjectExplorer', () => {
   it('lists all projects with the first one selected', async () => {
     const { router } = await mountExplorer({ kind: 'all' });
     const rows = screen.getAllByRole('link').filter((link) => link.dataset.selected !== undefined);
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(7);
     expect(screen.getByText('PM Telegram Hub')).toBeInTheDocument();
     // The preview shows the first project by default.
     expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent(
@@ -39,23 +39,25 @@ describe('ProjectExplorer', () => {
     expect(rows[0]).toHaveAttribute('aria-current', 'true');
     expect(rows[1]).not.toHaveAttribute('aria-current');
 
-    await user.click(screen.getByText('distill'));
+    await user.click(screen.getByText('telegram-content-engine'));
     // The widget is pure; the page re-derives the preview from this URL state.
-    expect(router.state.location.search).toMatchObject({ selected: 'distill' });
+    expect(router.state.location.search).toMatchObject({ selected: 'telegram-content-engine' });
   });
 
   it('ignores modified clicks on a row so the browser can open a new tab', async () => {
     const user = userEvent.setup();
     const { router } = await mountExplorer({ kind: 'all' });
     await user.keyboard('{Meta>}');
-    await user.click(screen.getByText('distill'));
+    await user.click(screen.getByText('telegram-content-engine'));
     await user.keyboard('{/Meta}');
     expect(router.state.location.search).toEqual({});
   });
 
   it('previews the URL-selected project', async () => {
-    await mountExplorer({ kind: 'all', selected: 'distill' });
-    expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent('Distill');
+    await mountExplorer({ kind: 'all', selected: 'telegram-content-engine' });
+    expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent(
+      'Telegram Content Engine',
+    );
   });
 
   it('shows the empty state when nothing matches', async () => {
@@ -68,5 +70,16 @@ describe('ProjectExplorer', () => {
   it('offers the case study only for projects that have one', async () => {
     await mountExplorer({ kind: 'all', selected: 'splat-tours' });
     expect(screen.queryByRole('link', { name: /open case study/i })).not.toBeInTheDocument();
+  });
+
+  it('omits the screenshot when a project sets neither image nor caption', async () => {
+    await mountExplorer({ kind: 'all', selected: 'create-frontstack' });
+    expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
+  });
+
+  it('keeps the dashed placeholder when only a caption is set', async () => {
+    await mountExplorer({ kind: 'all', selected: 'splat-tours' });
+    expect(screen.getByText('screenshot')).toBeInTheDocument();
+    expect(screen.getByText('[Screenshot: a splat tour viewer]')).toBeInTheDocument();
   });
 });

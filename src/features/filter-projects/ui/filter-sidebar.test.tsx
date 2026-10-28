@@ -22,7 +22,7 @@ describe('FilterSidebar', () => {
   it('writes the kind to the URL and clears the selection', async () => {
     const user = userEvent.setup();
     const { router } = await renderWithRouter(<FilterSidebar search={{ kind: 'all' }} />, {
-      path: '/projects?selected=distill',
+      path: '/projects?selected=telegram-content-engine',
     });
     await user.click(screen.getByRole('button', { name: 'Side projects' }));
     expect(router.state.location.pathname).toBe('/projects');
