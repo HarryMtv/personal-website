@@ -75,6 +75,37 @@ describe('MobileTableOfContents', () => {
     }
   });
 
+  it('closes on Escape even after focus has left the bar', async () => {
+    const user = userEvent.setup();
+    const onDocumentEscape = vi.fn();
+    const onDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onDocumentEscape();
+    };
+    document.addEventListener('keydown', onDocumentKeyDown);
+    try {
+      render(
+        <>
+          <button type="button">Close window</button>
+          <MobileTableOfContents items={items} activeId="day-1" />
+        </>,
+      );
+      await user.click(toggle());
+      // Shift+Tab to the preceding window control, outside the bar.
+      await user.tab({ shift: true });
+      const outside = screen.getByRole('button', { name: 'Close window' });
+      expect(outside).toHaveFocus();
+
+      await user.keyboard('{Escape}');
+
+      expect(screen.queryByRole('navigation', { name: 'Contents' })).toBeNull();
+      expect(onDocumentEscape).not.toHaveBeenCalled();
+      // Focus stays where the reader put it.
+      expect(outside).toHaveFocus();
+    } finally {
+      document.removeEventListener('keydown', onDocumentKeyDown);
+    }
+  });
+
   it('updates the shown section when the active id changes', () => {
     const { rerender } = render(<MobileTableOfContents items={items} activeId="day-1" />);
     expect(toggle()).toHaveTextContent('Day 1 · Beginning');

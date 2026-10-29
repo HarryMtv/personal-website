@@ -99,6 +99,15 @@ test('the article uses the full width and the contents bar sticks', async ({ pag
   await expect(toggle).toBeFocused();
   await expect(page).toHaveURL(/\/writing\/telegram-pm-hub-in-5-days#day-5/);
 
+  // Escape still only closes the dropdown once focus has left the bar.
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Shift+Tab');
+  await expect(toggle).not.toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page).toHaveURL(/\/writing\/telegram-pm-hub-in-5-days#day-5/);
+
   // Escape with dropdown closed closes the window.
   await page.keyboard.press('Escape');
   await expect(page).toHaveURL(/\/writing$/);

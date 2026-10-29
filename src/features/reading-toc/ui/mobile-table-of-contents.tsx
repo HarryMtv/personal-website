@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import type { TocEntry } from './table-of-contents';
 import { tocLinkClass } from './toc-link';
@@ -17,21 +17,27 @@ interface MobileTableOfContentsProps {
 export function MobileTableOfContents({ items, activeId }: MobileTableOfContentsProps) {
   const [open, setOpen] = useState(false);
   const listId = useId();
+  const barRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const active = items.find((item) => item.id === activeId) ?? items[0];
 
+  useEffect(() => {
+    if (!open) return;
+    // Escape dismisses the open list wherever focus sits. The capture-phase
+    // window listener runs before the window's useEscapeToClose (a document
+    // listener) and stops it, so the article stays open.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      setOpen(false);
+      if (barRef.current?.contains(document.activeElement)) buttonRef.current?.focus();
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [open]);
+
   return (
-    <div
-      className="sticky top-[55px] z-[4] w-full min-[900px]:hidden"
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' && open) {
-          // Keep the window's useEscapeToClose (a document listener) from firing.
-          event.stopPropagation();
-          setOpen(false);
-          buttonRef.current?.focus();
-        }
-      }}
-    >
+    <div ref={barRef} className="sticky top-[55px] z-[4] w-full min-[900px]:hidden">
       <button
         ref={buttonRef}
         type="button"
