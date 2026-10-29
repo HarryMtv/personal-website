@@ -1,5 +1,5 @@
-import { cn } from '@/shared/lib/cn';
 import { MobileTableOfContents } from './mobile-table-of-contents';
+import { tocLinkClass } from './toc-link';
 
 export interface TocEntry {
   id: string;
@@ -32,10 +32,7 @@ export function TableOfContents({ items, activeId }: TableOfContentsProps) {
               key={item.id}
               href={`#${item.id}`}
               aria-current={active ? 'location' : undefined}
-              className={cn(
-                'text-ink rounded-md px-2.5 py-1.5 text-sm no-underline',
-                active ? 'bg-highlight font-semibold' : 'hover:bg-paper-2',
-              )}
+              className={tocLinkClass(active)}
             >
               {item.value}
             </a>

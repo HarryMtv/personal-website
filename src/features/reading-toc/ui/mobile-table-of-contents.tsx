@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import { useId, useRef, useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import type { TocEntry } from './table-of-contents';
+import { tocLinkClass } from './toc-link';
 
 interface MobileTableOfContentsProps {
   items: TocEntry[];
@@ -65,10 +66,7 @@ export function MobileTableOfContents({ items, activeId }: MobileTableOfContents
                 href={`#${item.id}`}
                 aria-current={isActive ? 'location' : undefined}
                 onClick={() => setOpen(false)}
-                className={cn(
-                  'text-ink rounded-md px-2.5 py-1.5 text-sm no-underline',
-                  isActive ? 'bg-highlight font-semibold' : 'hover:bg-paper-2',
-                )}
+                className={tocLinkClass(isActive)}
               >
                 {item.value}
               </a>
