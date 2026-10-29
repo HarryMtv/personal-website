@@ -23,9 +23,9 @@ export function PostPage() {
       closeTo="/writing"
       variant="reader"
     >
-      <div className="flex flex-wrap items-start gap-6 p-[clamp(24px,5vw,64px)]">
+      <div className="flex flex-col gap-6 p-[clamp(24px,5vw,64px)] min-[900px]:flex-row min-[900px]:items-start">
         <TableOfContents items={toc} activeId={activeId} />
-        <Prose className="flex-1">
+        <Prose className="w-full min-[900px]:flex-1">
           <p className="text-muted m-0 font-mono text-[13px] font-medium">
             {formatDate(post.date)}
             {post.source ? (
