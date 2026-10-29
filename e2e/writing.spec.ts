@@ -41,8 +41,9 @@ test('the TOC stays in view and follows the scroll', async ({ page }) => {
 test('the article uses the full width and the contents bar sticks', async ({ page }) => {
   test.skip((page.viewportSize()?.width ?? 1440) >= 900, 'mobile viewport only');
   await page.goto('/writing/telegram-pm-hub-in-5-days');
-  // The route's view-transition overlay swallows taps until it finishes; a
-  // click during it makes Playwright scroll and retry, moving the page.
+  // Routes are code-split, so wait for the window to render before checking
+  // running animations; otherwise `getAnimations()` runs on the empty shell.
+  await expect(page.locator('[data-window]').first()).toBeVisible();
   await page.waitForFunction(() =>
     document.getAnimations().every((animation) => animation.playState !== 'running'),
   );
