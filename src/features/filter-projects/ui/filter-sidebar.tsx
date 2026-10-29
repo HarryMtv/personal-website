@@ -19,7 +19,8 @@ interface FilterSidebarProps {
  * The LOCATIONS / TAGS sidebar. Every choice is written into the URL (the
  * single source of truth) and clears the selection; clicking the active tag
  * again clears it. Buttons instead of Links: TanStack Link's own active
- * detection collides with the filter's aria-current semantics.
+ * detection collides with the filter's aria-current semantics. Filtering is
+ * in-place state, so the scroll position is kept (`resetScroll: false`).
  */
 export function FilterSidebar({ search }: FilterSidebarProps) {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export function FilterSidebar({ search }: FilterSidebarProps) {
     navigate({
       to: '/projects',
       search: (prev: ProjectExplorerSearch) => ({ ...prev, kind, selected: undefined }),
+      resetScroll: false,
     });
 
   const toggleTag = (tag: ProjectTag) =>
@@ -39,6 +41,7 @@ export function FilterSidebar({ search }: FilterSidebarProps) {
         tag: search.tag === tag ? undefined : tag,
         selected: undefined,
       }),
+      resetScroll: false,
     });
 
   return (

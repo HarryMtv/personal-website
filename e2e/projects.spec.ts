@@ -28,6 +28,56 @@ test('keyboard filter activation keeps focus on the filter button', async ({ pag
   await expect(work).toBeFocused();
 });
 
+test('selecting a row on mobile keeps the scroll position', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 1440) >= 900, 'mobile viewport only');
+  await page.goto('/projects');
+  // Routes are code-split, so wait for the window to render before checking
+  // running animations; otherwise `getAnimations()` runs on the empty shell.
+  await expect(page.locator('a[data-selected]').first()).toBeVisible();
+  // Motion animations block taps on mobile for ~300ms.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  const row = page.locator('a[data-selected]').last();
+  await row.scrollIntoViewIfNeeded();
+  const before = await page.evaluate(() => window.scrollY);
+  expect(before).toBeGreaterThan(0);
+
+  await row.click();
+  await expect(page).toHaveURL(/selected=create-frontstack/);
+  await expect(row).toHaveAttribute('aria-current', 'true');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toContainText(
+    'create-frontstack',
+  );
+  // Selection is in-place state: the router must not reset the scroll. Poll
+  // so a post-commit reset would have had time to land.
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(50);
+});
+
+test('changing a filter on mobile keeps the scroll position', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 1440) >= 900, 'mobile viewport only');
+  await page.goto('/projects');
+  await expect(page.locator('a[data-selected]').first()).toBeVisible();
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  // TypeScript leaves five of the seven rows, so the page stays tall enough
+  // that the browser cannot clamp the offset back to 0.
+  const tag = page.getByRole('button', { name: 'TypeScript' });
+  await page.evaluate(() => window.scrollTo(0, 120));
+  const before = await page.evaluate(() => window.scrollY);
+  expect(before).toBeGreaterThan(0);
+
+  await tag.click();
+  await expect(page).toHaveURL(/tag=typescript/);
+  await expect(page.locator('a[data-selected]')).toHaveCount(5);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(50);
+});
+
 test('opening the case study and closing back', async ({ page }) => {
   await page.goto('/projects');
   await page.getByRole('link', { name: /open case study/i }).click();
