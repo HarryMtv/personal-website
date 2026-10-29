@@ -81,4 +81,38 @@ describe('MobileTableOfContents', () => {
     rerender(<MobileTableOfContents items={items} activeId="day-2" />);
     expect(toggle()).toHaveTextContent('Day 2 · Adapters');
   });
+
+  it('falls back to the first section when activeId does not match any item', () => {
+    render(<MobileTableOfContents items={items} activeId="non-existent-section" />);
+    expect(toggle()).toHaveTextContent('Day 1 · Beginning');
+  });
+
+  it('closes the dropdown when the toggle button is clicked a second time', async () => {
+    const user = userEvent.setup();
+    render(<MobileTableOfContents items={items} activeId="day-1" />);
+    await user.click(toggle());
+    expect(toggle()).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
+
+    await user.click(toggle());
+    expect(toggle()).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('navigation', { name: 'Contents' })).toBeNull();
+  });
+
+  it('ignores non-Escape keys while open and lets them propagate', async () => {
+    const user = userEvent.setup();
+    const onDocumentKeyDown = vi.fn();
+    document.addEventListener('keydown', onDocumentKeyDown);
+    try {
+      render(<MobileTableOfContents items={items} activeId="day-1" />);
+      await user.click(toggle());
+      await user.keyboard('{ArrowDown}');
+
+      expect(toggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
+      expect(onDocumentKeyDown).toHaveBeenCalledTimes(1);
+    } finally {
+      document.removeEventListener('keydown', onDocumentKeyDown);
+    }
+  });
 });
