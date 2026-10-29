@@ -42,7 +42,8 @@ export function ProjectRow({ project, selected }: ProjectRowProps) {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
           return;
         event.preventDefault();
-        void navigate({ to: '/projects', search: nextSearch, replace: true });
+        // Selection is in-place state: keep the scroll position (mobile stacks the list).
+        void navigate({ to: '/projects', search: nextSearch, replace: true, resetScroll: false });
       }}
       className={cn(
         'text-ink relative grid items-center gap-x-3 rounded-md px-3 py-2.5 text-sm',
