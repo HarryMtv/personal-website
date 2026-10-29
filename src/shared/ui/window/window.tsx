@@ -83,7 +83,9 @@ export function Window({
       dragConstraints={bounds ?? undefined}
       dragMomentum={false}
       className={cn(
-        'window rounded-window border-ink/25 shadow-window mx-auto flex w-full flex-col overflow-hidden border',
+        // `overflow-clip` (unlike `hidden`) does not create a scroll container,
+        // so `position: sticky` descendants keep working.
+        'window rounded-window border-ink/25 shadow-window mx-auto flex w-full flex-col overflow-clip border',
         'max-[899px]:rounded-b-none max-[899px]:shadow-[0_-8px_30px_rgb(40_12_0/0.35)]',
         MAX_WIDTH[maxWidth],
       )}

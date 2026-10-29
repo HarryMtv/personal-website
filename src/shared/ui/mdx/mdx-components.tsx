@@ -11,7 +11,10 @@ import { PullQuote } from './pull-quote';
  */
 export const mdxComponents: MDXComponents = {
   h2: (props) => (
-    <h2 className="font-display text-ink m-0 text-[28px] font-bold tracking-[-0.01em]" {...props} />
+    <h2
+      className="font-display text-ink m-0 scroll-mt-28 text-[28px] font-bold tracking-[-0.01em] min-[900px]:scroll-mt-20"
+      {...props}
+    />
   ),
   p: (props) => <p className="m-0 text-pretty" {...props} />,
   ul: (props) => <ul className="m-0 flex list-disc flex-col gap-2 pl-5" {...props} />,
