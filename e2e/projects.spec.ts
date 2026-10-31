@@ -86,3 +86,90 @@ test('opening the case study and closing back', async ({ page }) => {
   await page.getByRole('link', { name: 'Close window' }).click();
   await expect(page).toHaveURL(/\/projects$/);
 });
+
+test('the preview screenshot opens full size and closes back in place', async ({ page }) => {
+  const isMobile = (page.viewportSize()?.width ?? 1440) < 900;
+  await page.goto('/projects?selected=pm-telegram-hub');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toContainText(
+    'PM Telegram Hub',
+  );
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
+  await trigger.scrollIntoViewIfNeeded();
+  const scrollBefore = await page.evaluate(() => window.scrollY);
+  // On mobile the preview sits below the list, so the page must be scrolled.
+  if (isMobile) expect(scrollBefore).toBeGreaterThan(0);
+  const thumbWidth = (await trigger.locator('img').boundingBox())?.width ?? 0;
+  const urlBefore = page.url();
+
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  const image = dialog.locator('img');
+  await expect(image).toHaveAttribute('src', '/images/pm-telegram-hub.png');
+  // Fades are WAAPI (seen by getAnimations); the shared-layout zoom runs on
+  // motion's frame loop, so give it its 0.3s before measuring the box.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+  await page.waitForTimeout(350);
+  const lightboxWidth = (await image.boundingBox())?.width ?? 0;
+  if (isMobile) {
+    // The viewport caps the image: it fills the backdrop minus its padding.
+    const available = (page.viewportSize()?.width ?? 390) - 48;
+    expect(lightboxWidth).toBeGreaterThan(available - 40);
+  } else {
+    expect(lightboxWidth).toBeGreaterThan(thumbWidth);
+  }
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(page).toHaveURL(urlBefore);
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
+  // The scroll lock restores the exact offset; poll so a late reset shows up.
+  await expect
+    .poll(() => page.evaluate((from) => Math.abs(window.scrollY - from), scrollBefore))
+    .toBeLessThan(2);
+  await expect(trigger).toBeFocused();
+});
+
+test('escape in the case-study lightbox keeps the window open', async ({ page }) => {
+  await page.goto('/projects/pm-telegram-hub');
+  await expect(page.getByRole('heading', { level: 1, name: /pm telegram hub/i })).toBeVisible();
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  // Escape closed only the lightbox: the window (a useEscapeToClose listener)
+  // would have navigated back to /projects.
+  await expect(page).toHaveURL(/\/projects\/pm-telegram-hub$/);
+  await expect(page.getByRole('article')).toBeVisible();
+});
+
+test('the backdrop click closes the lightbox', async ({ page }) => {
+  await page.goto('/projects?selected=pm-telegram-hub');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
+  const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  // Click near the bottom-right of the backdrop. The top-right holds the
+  // close button, and the TanStack Router devtools badge (dev-only, z-99999)
+  // lives in the bottom-left corner.
+  const box = (await dialog.boundingBox())!;
+  await page.mouse.click(box.x + box.width - 16, box.y + box.height - 16);
+  await expect(dialog).toBeHidden();
+});
