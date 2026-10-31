@@ -1,4 +1,6 @@
-import { useId } from 'react';
+import { AnimatePresence } from 'motion/react';
+import { useId, useState } from 'react';
+import { ScreenshotLightbox } from './screenshot-lightbox';
 
 interface ScreenshotProps {
   src: string;
@@ -11,10 +13,12 @@ interface ScreenshotProps {
 
 /**
  * A mounted screenshot: the image sits on a paper mat with a soft shadow,
- * captioned underneath in the same mono style as the old placeholder.
+ * captioned underneath in the same mono style as the old placeholder. The
+ * mat is a button — clicking it opens the image fullscreen in a lightbox.
  */
 export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
   const captionId = useId();
+  const [open, setOpen] = useState(false);
   return (
     <figure
       className="mx-auto flex w-full max-w-[960px] flex-col gap-3"
@@ -26,6 +30,7 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           type="button"
           aria-label="Open full-size screenshot"
           aria-haspopup="dialog"
+          onClick={() => setOpen(true)}
           className="block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <img
@@ -42,6 +47,17 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           {caption}
         </figcaption>
       ) : null}
+      <AnimatePresence>
+        {open ? (
+          <ScreenshotLightbox
+            src={src}
+            width={width}
+            height={height}
+            caption={caption}
+            onClose={() => setOpen(false)}
+          />
+        ) : null}
+      </AnimatePresence>
     </figure>
   );
 }
