@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, m } from 'motion/react';
 import { useId, useRef, useState } from 'react';
 import { ScreenshotLightbox } from './screenshot-lightbox';
 
@@ -18,6 +18,9 @@ interface ScreenshotProps {
  */
 export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
   const captionId = useId();
+  // Shared with the lightbox image, so opening zooms the thumbnail into the
+  // fullscreen view and closing zooms it back into the (spacer-held) slot.
+  const layoutId = useId();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   return (
@@ -35,13 +38,25 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           onClick={() => setOpen(true)}
           className="block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          <img
-            src={src}
-            alt=""
-            width={width}
-            height={height}
-            className="block h-auto w-full rounded-[8px]"
-          />
+          {open ? (
+            // The zoomed image lives in the lightbox now; an equally tall
+            // spacer keeps the mat, window and page from reflowing.
+            <div
+              aria-hidden="true"
+              className="block w-full rounded-[8px]"
+              style={{ aspectRatio: `${width} / ${height}` }}
+            />
+          ) : (
+            <m.img
+              layoutId={layoutId}
+              layoutCrossfade={false}
+              src={src}
+              alt=""
+              width={width}
+              height={height}
+              className="block h-auto w-full rounded-[8px]"
+            />
+          )}
         </button>
       </div>
       {caption ? (
@@ -56,6 +71,7 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
             width={width}
             height={height}
             caption={caption}
+            layoutId={layoutId}
             onClose={() => {
               setOpen(false);
               // `preventScroll` so landing back on the thumbnail cannot shift

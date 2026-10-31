@@ -16,6 +16,11 @@ beforeAll(() => {
   // an unhandled rejection. Drop `animate` so motion drives the fades from
   // its own frame loop, where cancelling is a plain synchronous stop.
   delete (Element.prototype as { animate?: unknown }).animate;
+  // It also lays out nothing — every rect is 0×0 — and motion's shared-layout
+  // projection never completes a handoff exit in that degenerate case, so the
+  // lightbox would never unmount. Give every element a fixed measurable box.
+  Element.prototype.getBoundingClientRect = () =>
+    ({ x: 0, y: 0, top: 0, left: 0, right: 100, bottom: 56, width: 100, height: 56, toJSON: () => ({}) }) as DOMRect;
 });
 
 // The app mounts components inside LazyMotion/MotionConfig (see app-providers);
@@ -180,5 +185,16 @@ describe('Screenshot', () => {
       Reflect.deleteProperty(window, 'scrollX');
       Reflect.deleteProperty(window, 'scrollY');
     }
+  });
+
+  it('holds the thumbnail slot with an aspect-ratio spacer while open', async () => {
+    const user = userEvent.setup();
+    mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+    const trigger = screen.getByRole('button', { name: 'Open full-size screenshot' });
+    await user.click(trigger);
+    expect(trigger.querySelector('img')).not.toBeInTheDocument();
+    const spacer = trigger.querySelector('div');
+    expect(spacer).toHaveAttribute('aria-hidden', 'true');
+    expect(spacer?.style.aspectRatio).toBe('1024 / 572');
   });
 });

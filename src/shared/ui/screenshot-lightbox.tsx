@@ -10,15 +10,27 @@ interface ScreenshotLightboxProps {
   width: number;
   height: number;
   caption?: string;
+  /** Shared with the thumbnail, so the image zooms between the two slots. */
+  layoutId: string;
   onClose: () => void;
 }
+
+/** The windows' entry easing (see the `window-in` keyframes in index.css). */
+const LAYOUT_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /**
  * The fullscreen view behind `Screenshot`: the image sits on the same paper
  * mat over a dimmed backdrop, and the close button, a click anywhere or
  * Escape zooms it back into its thumbnail.
  */
-export function ScreenshotLightbox({ src, width, height, caption, onClose }: ScreenshotLightboxProps) {
+export function ScreenshotLightbox({
+  src,
+  width,
+  height,
+  caption,
+  layoutId,
+  onClose,
+}: ScreenshotLightboxProps) {
   const captionId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -100,12 +112,15 @@ export function ScreenshotLightbox({ src, width, height, caption, onClose }: Scr
         transition={{ duration: 0.2, ease: 'easeOut', exit: { duration: 0.16 } }}
         className="bg-paper-2 rounded-card shadow-window p-2"
       >
-        <img
+        <m.img
+          layoutId={layoutId}
+          layoutCrossfade={false}
           src={src}
           alt=""
           width={width}
           height={height}
           style={{ maxWidth: `min(${width}px, 100%)`, maxHeight: 'calc(100dvh - 120px)' }}
+          transition={{ layout: { duration: 0.3, ease: LAYOUT_EASE } }}
           className="block h-auto w-auto rounded-[8px] object-contain"
         />
       </m.figure>
