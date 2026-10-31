@@ -22,13 +22,20 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
       aria-label={caption ? undefined : 'Screenshot'}
     >
       <div className="rounded-card border-ink/12 bg-paper-2 overflow-hidden border p-2 shadow-[0_16px_44px_rgb(30_27_24/0.14)] sm:p-3">
-        <img
-          src={src}
-          alt=""
-          width={width}
-          height={height}
-          className="block h-auto w-full rounded-[8px]"
-        />
+        <button
+          type="button"
+          aria-label="Open full-size screenshot"
+          aria-haspopup="dialog"
+          className="block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          <img
+            src={src}
+            alt=""
+            width={width}
+            height={height}
+            className="block h-auto w-full rounded-[8px]"
+          />
+        </button>
       </div>
       {caption ? (
         <figcaption id={captionId} className="text-muted m-0 font-mono text-xs">
