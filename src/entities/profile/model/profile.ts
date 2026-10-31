@@ -75,8 +75,8 @@ export const profile = {
   now: {
     updatedAt: '2026-10',
     items: [
-      'Polishing PM Telegram Hub and writing up how it was built',
-      'Moving my notes into Obsidian so agents can use them as context',
+      'Building a React Native app for time optimization',
+      'Studying new AI tools and earning certificates',
       'Czech lessons, A2 in sight',
     ],
   },

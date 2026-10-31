@@ -64,7 +64,7 @@ test('changing a filter on mobile keeps the scroll position', async ({ page }) =
     document.getAnimations().every((animation) => animation.playState !== 'running'),
   );
 
-  // TypeScript leaves five of the seven rows, so the page stays tall enough
+  // TypeScript leaves six of the eight rows, so the page stays tall enough
   // that the browser cannot clamp the offset back to 0.
   const tag = page.getByRole('button', { name: 'TypeScript' });
   await page.evaluate(() => window.scrollTo(0, 120));
@@ -73,7 +73,7 @@ test('changing a filter on mobile keeps the scroll position', async ({ page }) =
 
   await tag.click();
   await expect(page).toHaveURL(/tag=typescript/);
-  await expect(page.locator('a[data-selected]')).toHaveCount(5);
+  await expect(page.locator('a[data-selected]')).toHaveCount(6);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(50);
 });

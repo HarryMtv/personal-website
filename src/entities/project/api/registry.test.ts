@@ -4,14 +4,14 @@ import { getProjectBySlug, getProjects, loadCaseStudy } from './registry';
 describe('project registry', () => {
   it('parses every content file', () => {
     // Registry construction throws ContentError on any invalid frontmatter.
-    expect(getProjects()).toHaveLength(7);
+    expect(getProjects()).toHaveLength(8);
   });
 
   it('derives unique slugs from filenames and sorts by order', () => {
     const projects = getProjects();
     const slugs = projects.map((project) => project.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
-    expect(projects.map((project) => project.order)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(projects.map((project) => project.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     expect(projects[0].slug).toBe('pm-telegram-hub');
     expect(projects.at(-1)?.slug).toBe('create-frontstack');
   });
@@ -30,6 +30,7 @@ describe('project registry', () => {
     ).toEqual([
       'pm-telegram-hub',
       'telegram-content-engine',
+      'google-map-scraper',
       'table-view',
       'host-app',
       'qa-automation-engine',

@@ -6,7 +6,7 @@ const projects = getProjects();
 
 describe('filterProjects', () => {
   it('returns everything for kind all without a tag', () => {
-    expect(filterProjects(projects, { kind: 'all' })).toHaveLength(7);
+    expect(filterProjects(projects, { kind: 'all' })).toHaveLength(8);
   });
 
   it('filters by kind', () => {
@@ -14,6 +14,7 @@ describe('filterProjects', () => {
     expect(side.map((project) => project.slug)).toEqual([
       'pm-telegram-hub',
       'telegram-content-engine',
+      'google-map-scraper',
       'create-frontstack',
     ]);
     const work = filterProjects(projects, { kind: 'work' });

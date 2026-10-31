@@ -131,6 +131,17 @@ describe('router integration', () => {
     expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
   });
 
+  it('renders the google-map-scraper case study', async () => {
+    await renderApp('/projects/google-map-scraper');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'GMaps Lead Finder' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /source on github/i })).not.toBeInTheDocument();
+    expect(screen.getByText('AI outreach')).toBeInTheDocument();
+    const figure = screen.getByRole('figure', { name: /the desktop app/i });
+    expect(figure.querySelector('img')).toHaveAttribute('src', '/images/google-map-scraper.png');
+  });
+
   it('renders the post with its CONTENTS nav and footer links', async () => {
     await renderApp('/writing/telegram-pm-hub-in-5-days');
     expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
@@ -157,7 +168,7 @@ describe('router integration', () => {
   it('falls back gracefully on invalid project search params', async () => {
     await renderApp('/projects?kind=bogus&tag=invalid');
     const allRows = document.querySelectorAll('a[data-selected]');
-    expect(allRows).toHaveLength(7);
+    expect(allRows).toHaveLength(8);
   });
 
   it('restores valid project deep links from the URL', async () => {
