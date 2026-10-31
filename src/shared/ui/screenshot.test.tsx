@@ -2,9 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LazyMotion, MotionConfig, domMax } from 'motion/react';
 import type { ReactNode } from 'react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, afterEach, describe, expect, it, vi } from 'vitest';
 import { useEscapeToClose } from '@/shared/lib/use-escape-to-close';
 import { Screenshot } from './screenshot';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 beforeAll(() => {
   // happy-dom's partial Web Animations API rejects `finished` with AbortError
@@ -111,5 +115,31 @@ describe('Screenshot', () => {
     expect(onWindowClose).not.toHaveBeenCalled();
     await user.keyboard('{Escape}');
     expect(onWindowClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('focuses the close button on open and keeps Tab on it', async () => {
+    const user = userEvent.setup();
+    mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    const close = screen.getByRole('button', { name: 'Close screenshot' });
+    expect(document.activeElement).toBe(close);
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+    await user.keyboard('{Tab}');
+    expect(document.activeElement).toBe(close);
+    await user.keyboard('{Shift>}{Tab}{/Shift}');
+    expect(document.activeElement).toBe(close);
+  });
+
+  it('returns focus to the trigger on close without scrolling', async () => {
+    const user = userEvent.setup();
+    mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+    const trigger = screen.getByRole('button', { name: 'Open full-size screenshot' });
+    await user.click(trigger);
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
+    await user.click(screen.getByRole('button', { name: 'Close screenshot' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(document.activeElement).toBe(trigger);
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
   });
 });

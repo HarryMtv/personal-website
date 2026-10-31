@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'motion/react';
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { ScreenshotLightbox } from './screenshot-lightbox';
 
 interface ScreenshotProps {
@@ -19,6 +19,7 @@ interface ScreenshotProps {
 export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
   const captionId = useId();
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   return (
     <figure
       className="mx-auto flex w-full max-w-[960px] flex-col gap-3"
@@ -27,6 +28,7 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
     >
       <div className="rounded-card border-ink/12 bg-paper-2 overflow-hidden border p-2 shadow-[0_16px_44px_rgb(30_27_24/0.14)] sm:p-3">
         <button
+          ref={triggerRef}
           type="button"
           aria-label="Open full-size screenshot"
           aria-haspopup="dialog"
@@ -54,7 +56,12 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
             width={width}
             height={height}
             caption={caption}
-            onClose={() => setOpen(false)}
+            onClose={() => {
+              setOpen(false);
+              // `preventScroll` so landing back on the thumbnail cannot shift
+              // the page the scroll lock just restored.
+              triggerRef.current?.focus({ preventScroll: true });
+            }}
           />
         ) : null}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { m } from 'motion/react';
 import { Button } from './button';
@@ -20,12 +20,25 @@ interface ScreenshotLightboxProps {
  */
 export function ScreenshotLightbox({ src, width, height, caption, onClose }: ScreenshotLightboxProps) {
   const captionId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // The close button is the only control; focus starts there so the
+    // visitor can dismiss immediately, and `preventScroll` keeps the open
+    // from shifting the page behind the backdrop.
+    closeRef.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     // Escape dismisses the lightbox wherever focus sits. The capture-phase
     // window listener runs before the window's useEscapeToClose (a document
-    // listener) and stops it, so the surrounding window stays open.
+    // listener) and stops it, so the surrounding window stays open. Tab
+    // cycles nowhere — the close button is the only focusable element.
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        return;
+      }
       if (event.key !== 'Escape') return;
       event.stopPropagation();
       onClose();
@@ -48,6 +61,7 @@ export function ScreenshotLightbox({ src, width, height, caption, onClose }: Scr
       className="bg-ink/70 fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 overflow-hidden p-6 backdrop-blur-sm"
     >
       <Button
+        ref={closeRef}
         type="button"
         variant="window"
         aria-label="Close screenshot"
