@@ -2,7 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LazyMotion, MotionConfig, domMax } from 'motion/react';
 import type { ReactNode } from 'react';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { useEscapeToClose } from '@/shared/lib/use-escape-to-close';
 import { Screenshot } from './screenshot';
 
 beforeAll(() => {
@@ -94,5 +95,21 @@ describe('Screenshot', () => {
     await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('keeps Escape to the lightbox while open, then hands it back to the window', async () => {
+    const onWindowClose = vi.fn();
+    function WindowStub() {
+      useEscapeToClose(onWindowClose);
+      return <Screenshot src="/shot.png" width={1024} height={572} />;
+    }
+    const user = userEvent.setup();
+    mount(<WindowStub />);
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onWindowClose).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
+    expect(onWindowClose).toHaveBeenCalledTimes(1);
   });
 });
