@@ -23,6 +23,26 @@ export function ScreenshotLightbox({ src, width, height, caption, onClose }: Scr
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    // Freeze the page behind the backdrop. Hiding the scrollbar would shift
+    // the layout, so the body gets it back as padding; the cleanup scrolls
+    // to the saved offset — iOS can still creep while locked — without
+    // animating, and puts the inline styles back as they were.
+    const root = document.documentElement;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const previousOverflow = root.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    root.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+    return () => {
+      root.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+      window.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' });
+    };
+  }, []);
+
+  useEffect(() => {
     // The close button is the only control; focus starts there so the
     // visitor can dismiss immediately, and `preventScroll` keeps the open
     // from shifting the page behind the backdrop.

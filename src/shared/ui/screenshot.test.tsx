@@ -142,4 +142,43 @@ describe('Screenshot', () => {
     expect(document.activeElement).toBe(trigger);
     expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
   });
+
+  it('locks the page scroll while open and restores it on close', async () => {
+    const user = userEvent.setup();
+    // innerWidth defaults to 1024 in happy-dom; a narrower clientWidth fakes
+    // a classic scrollbar the lock has to compensate for on the body.
+    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: 984 });
+    try {
+      mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+      await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+      expect(document.documentElement.style.overflow).toBe('hidden');
+      expect(document.body.style.paddingRight).toBe('40px');
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(document.documentElement.style.overflow).toBe('');
+      expect(document.body.style.paddingRight).toBe('');
+    } finally {
+      Reflect.deleteProperty(document.documentElement, 'clientWidth');
+    }
+  });
+
+  it('returns the page to the saved scroll offset on close', async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(window, 'scrollX', { configurable: true, value: 12 });
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 640 });
+    const scrollTo = vi.fn();
+    const originalScrollTo = window.scrollTo;
+    Object.defineProperty(window, 'scrollTo', { configurable: true, value: scrollTo });
+    try {
+      mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+      await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(scrollTo).toHaveBeenCalledWith({ left: 12, top: 640, behavior: 'instant' });
+    } finally {
+      Object.defineProperty(window, 'scrollTo', { configurable: true, value: originalScrollTo });
+      Reflect.deleteProperty(window, 'scrollX');
+      Reflect.deleteProperty(window, 'scrollY');
+    }
+  });
 });
