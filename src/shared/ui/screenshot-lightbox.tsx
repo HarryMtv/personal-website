@@ -88,8 +88,8 @@ export function ScreenshotLightbox({
       onClick={onClose}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2, ease: 'easeOut', exit: { duration: 0.16 } }}
+      exit={{ opacity: 0, transition: { duration: 0.16 } }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className="bg-ink/70 fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 overflow-hidden p-6 backdrop-blur-sm"
     >
       <Button
@@ -108,8 +108,8 @@ export function ScreenshotLightbox({
       <m.figure
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2, ease: 'easeOut', exit: { duration: 0.16 } }}
+        exit={{ opacity: 0, transition: { duration: 0.16 } }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className="bg-paper-2 rounded-card shadow-window p-2"
       >
         <m.img

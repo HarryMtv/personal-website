@@ -20,7 +20,7 @@ beforeAll(() => {
   // projection never completes a handoff exit in that degenerate case, so the
   // lightbox would never unmount. Give every element a fixed measurable box.
   Element.prototype.getBoundingClientRect = () =>
-    ({ x: 0, y: 0, top: 0, left: 0, right: 100, bottom: 56, width: 100, height: 56, toJSON: () => ({}) }) as DOMRect;
+    ({ x: 0, y: 0, top: 0, left: 0, right: 100, bottom: 56, width: 100, height: 56, toJSON: () => ({}) });
 });
 
 // The app mounts components inside LazyMotion/MotionConfig (see app-providers);
@@ -171,9 +171,7 @@ describe('Screenshot', () => {
     const user = userEvent.setup();
     Object.defineProperty(window, 'scrollX', { configurable: true, value: 12 });
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 640 });
-    const scrollTo = vi.fn();
-    const originalScrollTo = window.scrollTo;
-    Object.defineProperty(window, 'scrollTo', { configurable: true, value: scrollTo });
+    const scrollTo = vi.spyOn(window, 'scrollTo');
     try {
       mount(<Screenshot src="/shot.png" width={1024} height={572} />);
       await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
@@ -181,7 +179,6 @@ describe('Screenshot', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
       expect(scrollTo).toHaveBeenCalledWith({ left: 12, top: 640, behavior: 'instant' });
     } finally {
-      Object.defineProperty(window, 'scrollTo', { configurable: true, value: originalScrollTo });
       Reflect.deleteProperty(window, 'scrollX');
       Reflect.deleteProperty(window, 'scrollY');
     }
