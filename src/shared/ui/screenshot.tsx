@@ -1,5 +1,4 @@
-import { AnimatePresence, m } from 'motion/react';
-import { useId, useRef, useState } from 'react';
+import { useCallback, useId, useRef, useState } from 'react';
 import { ScreenshotLightbox } from './screenshot-lightbox';
 
 interface ScreenshotProps {
@@ -14,15 +13,23 @@ interface ScreenshotProps {
 /**
  * A mounted screenshot: the image sits on a paper mat with a soft shadow,
  * captioned underneath in the same mono style as the old placeholder. The
- * mat is a button — clicking it opens the image fullscreen in a lightbox.
+ * mat is a button — clicking it opens the image fullscreen in a lightbox
+ * that zooms out of the thumbnail and back into it.
  */
 export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
   const captionId = useId();
-  // Shared with the lightbox image, so opening zooms the thumbnail into the
-  // fullscreen view and closing zooms it back into the (spacer-held) slot.
-  const layoutId = useId();
-  const [open, setOpen] = useState(false);
+  const [shot, setShot] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  // The zoom reads the thumbnail's rect when it opens and again when it
+  // closes — the window may have been dragged in between. A stable callback
+  // keeps the lightbox's listeners from re-subscribing.
+  const getOriginRect = useCallback(() => triggerRef.current?.getBoundingClientRect() ?? null, []);
+  const handleExited = useCallback(() => {
+    setShot(false);
+    // `preventScroll` so landing back on the thumbnail cannot shift the page
+    // the scroll lock just restored.
+    triggerRef.current?.focus({ preventScroll: true });
+  }, []);
   return (
     <figure
       className="mx-auto flex w-full max-w-[960px] flex-col gap-3"
@@ -35,28 +42,19 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           type="button"
           aria-label="Open full-size screenshot"
           aria-haspopup="dialog"
-          onClick={() => setOpen(true)}
+          onClick={() => setShot(true)}
           className="focus-visible:outline-accent block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          {open ? (
-            // The zoomed image lives in the lightbox now; an equally tall
-            // spacer keeps the mat, window and page from reflowing.
-            <span
-              aria-hidden="true"
-              className="block w-full rounded-[8px]"
-              style={{ aspectRatio: `${width} / ${height}` }}
-            />
-          ) : (
-            <m.img
-              layoutId={layoutId}
-              layoutCrossfade={false}
-              src={src}
-              alt=""
-              width={width}
-              height={height}
-              className="block h-auto w-full rounded-[8px]"
-            />
-          )}
+          {/* Hidden while the lightbox owns the view, but never unmounted:
+              the reserved box keeps the mat, window and page from reflowing. */}
+          <img
+            src={src}
+            alt=""
+            width={width}
+            height={height}
+            style={{ visibility: shot ? 'hidden' : 'visible' }}
+            className="block h-auto w-full rounded-[8px]"
+          />
         </button>
       </div>
       {caption ? (
@@ -64,23 +62,16 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           {caption}
         </figcaption>
       ) : null}
-      <AnimatePresence>
-        {open ? (
-          <ScreenshotLightbox
-            src={src}
-            width={width}
-            height={height}
-            caption={caption}
-            layoutId={layoutId}
-            onClose={() => {
-              setOpen(false);
-              // `preventScroll` so landing back on the thumbnail cannot shift
-              // the page the scroll lock just restored.
-              triggerRef.current?.focus({ preventScroll: true });
-            }}
-          />
-        ) : null}
-      </AnimatePresence>
+      {shot ? (
+        <ScreenshotLightbox
+          src={src}
+          width={width}
+          height={height}
+          caption={caption}
+          getOriginRect={getOriginRect}
+          onExited={handleExited}
+        />
+      ) : null}
     </figure>
   );
 }

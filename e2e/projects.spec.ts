@@ -111,8 +111,8 @@ test('the preview screenshot opens full size and closes back in place', async ({
   await expect(dialog).toBeVisible();
   const image = dialog.locator('img');
   await expect(image).toHaveAttribute('src', '/images/pm-telegram-hub.png');
-  // Fades are WAAPI (seen by getAnimations); the shared-layout zoom runs on
-  // motion's frame loop, so give it its 0.3s before measuring the box.
+  // Fades are WAAPI (seen by getAnimations); the FLIP zoom runs on motion's
+  // frame loop, so give it its 0.3s before measuring the box.
   await page.waitForFunction(() =>
     document.getAnimations().every((animation) => animation.playState !== 'running'),
   );
@@ -193,12 +193,20 @@ test('axe reports no serious or critical violations when the screenshot lightbox
   expect(serious).toEqual([]);
 });
 
-// TODO(QA): Open issue — opening the lightbox resets the ancestor m.article[data-window]
-// drag transform to `none`, snapping a dragged desktop window back to center.
-test.skip('opening and closing the lightbox on a dragged desktop window keeps the dragged position', async ({
+// The zoom is a manual FLIP inside the lightbox portal: it must never touch
+// the draggable m.article[data-window] ancestor, whose drag transform a
+// shared layoutId would re-project and reset. Two setup notes: the xl window
+// fills its desk at the default 1440px viewport (zero drag slack, every drag
+// springs back), so the viewport is widened until the window caps at 1280px
+// and a horizontal drag genuinely persists; and the drag only arms with
+// motion allowed, so reduced motion is emulated off for host machines that
+// have it on.
+test('opening and closing the lightbox on a dragged desktop window keeps the dragged position', async ({
   page,
 }) => {
   test.skip((page.viewportSize()?.width ?? 1440) < 900, 'desktop viewport only');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1700, height: 1000 });
   await page.goto('/projects?selected=google-map-scraper');
   await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
   await page.waitForFunction(() =>
@@ -209,7 +217,9 @@ test.skip('opening and closing the lightbox on a dragged desktop window keeps th
   const titleBox = (await titleBar.boundingBox())!;
   await page.mouse.move(titleBox.x + 200, titleBox.y + 15);
   await page.mouse.down();
-  await page.mouse.move(titleBox.x + 80, titleBox.y + 120, { steps: 10 });
+  // Purely horizontal, well inside the slack: an out-of-bounds drag would
+  // spring back on release and mask what the lightbox does.
+  await page.mouse.move(titleBox.x + 160, titleBox.y + 15, { steps: 10 });
   await page.mouse.up();
 
   const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
@@ -226,14 +236,15 @@ test.skip('opening and closing the lightbox on a dragged desktop window keeps th
   expect(Math.abs(afterThumb.y - draggedThumb.y)).toBeLessThan(2);
 });
 
-// TODO(QA): Open issue — on close, Screenshot immediately mounts the thumbnail
-// m.img inside its `overflow-hidden` mat behind the z-50 backdrop while Motion
-// sets `visibility: hidden` on the lightbox m.img, leaving a blank cream figure
-// in the lightbox and clipping the shrinking image inside the thumbnail box.
-test.skip('closing the lightbox animates the image back without clipping it or showing a blank mat', async ({
+// The whole close animation (mat and image) lives in the portal above the
+// backdrop; the thumbnail only reappears once the zoom has landed on it.
+// Reduced motion is emulated off so the 0.3s zoom actually plays and the
+// mid-close frame below is a real in-flight one.
+test('closing the lightbox animates the image back without clipping it or showing a blank mat', async ({
   page,
 }) => {
   test.skip((page.viewportSize()?.width ?? 1440) < 900, 'desktop viewport only');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/projects?selected=google-map-scraper');
   await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
   await page.waitForFunction(() =>

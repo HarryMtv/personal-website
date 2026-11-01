@@ -16,9 +16,8 @@ beforeAll(() => {
   // an unhandled rejection. Drop `animate` so motion drives the fades from
   // its own frame loop, where cancelling is a plain synchronous stop.
   delete (Element.prototype as { animate?: unknown }).animate;
-  // It also lays out nothing — every rect is 0×0 — and motion's shared-layout
-  // projection never completes a handoff exit in that degenerate case, so the
-  // lightbox would never unmount. Give every element a fixed measurable box.
+  // It also lays out nothing — every rect is 0×0 — which would degenerate the
+  // lightbox's FLIP measurements. Give every element a fixed measurable box.
   Element.prototype.getBoundingClientRect = () => ({
     x: 0,
     y: 0,
@@ -196,15 +195,18 @@ describe('Screenshot', () => {
     }
   });
 
-  it('holds the thumbnail slot with an aspect-ratio spacer while open', async () => {
+  it('keeps the thumbnail mounted but hidden while the lightbox owns the view', async () => {
     const user = userEvent.setup();
     mount(<Screenshot src="/shot.png" width={1024} height={572} />);
     const trigger = screen.getByRole('button', { name: 'Open full-size screenshot' });
+    const image = trigger.querySelector('img');
     await user.click(trigger);
-    expect(trigger.querySelector('img')).not.toBeInTheDocument();
-    const spacer = trigger.querySelector('span');
-    expect(spacer).toHaveAttribute('aria-hidden', 'true');
-    expect(spacer?.style.aspectRatio).toBe('1024 / 572');
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveStyle({ visibility: 'hidden' });
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveStyle({ visibility: 'visible' });
   });
 
   it('opens the lightbox with the Space key', async () => {
