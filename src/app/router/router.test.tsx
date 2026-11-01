@@ -123,10 +123,7 @@ describe('router integration', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Telegram Content Engine' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /source on github/i })).toHaveAttribute(
-      'href',
-      'https://github.com/HarryMtv/telegram-content-engine',
-    );
+    expect(screen.queryByRole('link', { name: /source on github/i })).not.toBeInTheDocument();
     expect(screen.getByText('RAG draft')).toBeInTheDocument();
     expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
   });
