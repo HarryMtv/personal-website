@@ -190,7 +190,7 @@ describe('Screenshot', () => {
     const trigger = screen.getByRole('button', { name: 'Open full-size screenshot' });
     await user.click(trigger);
     expect(trigger.querySelector('img')).not.toBeInTheDocument();
-    const spacer = trigger.querySelector('div');
+    const spacer = trigger.querySelector('span');
     expect(spacer).toHaveAttribute('aria-hidden', 'true');
     expect(spacer?.style.aspectRatio).toBe('1024 / 572');
   });

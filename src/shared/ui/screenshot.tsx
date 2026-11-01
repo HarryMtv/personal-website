@@ -41,7 +41,7 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           {open ? (
             // The zoomed image lives in the lightbox now; an equally tall
             // spacer keeps the mat, window and page from reflowing.
-            <div
+            <span
               aria-hidden="true"
               className="block w-full rounded-[8px]"
               style={{ aspectRatio: `${width} / ${height}` }}
