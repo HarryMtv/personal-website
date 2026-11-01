@@ -175,10 +175,7 @@ test('the backdrop click closes the lightbox', async ({ page }) => {
   await expect(dialog).toBeHidden();
 });
 
-// TODO(QA): Open issue — on mobile, the lightbox caption (`text-paper/80` over
-// `bg-ink/70` atop `bg-card` #ffffff) has a 4.45:1 contrast ratio (< 4.5:1 WCAG AA
-// minimum for 12px text), causing axe to report a serious color-contrast violation.
-test.skip('axe reports no serious or critical violations when the screenshot lightbox is open', async ({
+test('axe reports no serious or critical violations when the screenshot lightbox is open', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

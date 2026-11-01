@@ -125,7 +125,7 @@ export function ScreenshotLightbox({
         />
       </m.figure>
       {caption ? (
-        <p id={captionId} className="text-paper/80 m-0 px-2 font-mono text-xs">
+        <p id={captionId} className="text-paper/90 m-0 px-2 font-mono text-xs">
           {caption}
         </p>
       ) : null}
