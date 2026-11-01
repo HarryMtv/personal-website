@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 import { cn } from '@/shared/lib/cn';
 
 const buttonVariants = cva(
@@ -39,7 +39,11 @@ function Button({
   asChild = false,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    /** React 19 passes `ref` as a regular prop; typed here so callers can focus the button. */
+    ref?: Ref<HTMLButtonElement>;
+  }) {
   const Comp = asChild ? Slot : 'button';
   return (
     <Comp

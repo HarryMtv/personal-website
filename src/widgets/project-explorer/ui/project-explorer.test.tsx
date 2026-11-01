@@ -23,7 +23,7 @@ describe('ProjectExplorer', () => {
   it('lists all projects with the first one selected', async () => {
     const { router } = await mountExplorer({ kind: 'all' });
     const rows = screen.getAllByRole('link').filter((link) => link.dataset.selected !== undefined);
-    expect(rows).toHaveLength(7);
+    expect(rows).toHaveLength(8);
     expect(screen.getByText('PM Telegram Hub')).toBeInTheDocument();
     // The preview shows the first project by default.
     expect(screen.getByRole('complementary', { name: 'Preview' })).toHaveTextContent(
@@ -84,9 +84,9 @@ describe('ProjectExplorer', () => {
     expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
   });
 
-  it('keeps the dashed placeholder when only a caption is set', async () => {
+  it('omits the screenshot for splat tours', async () => {
     await mountExplorer({ kind: 'all', selected: 'splat-tours' });
-    expect(screen.getByText('screenshot')).toBeInTheDocument();
-    expect(screen.getByText('[Screenshot: a splat tour viewer]')).toBeInTheDocument();
+    expect(screen.queryByText('screenshot')).not.toBeInTheDocument();
+    expect(screen.queryByRole('figure')).not.toBeInTheDocument();
   });
 });

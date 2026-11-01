@@ -1,0 +1,70 @@
+---
+title: 'GMaps Lead Finder'
+kind: 'side'
+kindLabel: 'Side project'
+tags: ['typescript', 'ai']
+summary: 'An Electron desktop app that scrapes Google Maps for local businesses without a website, finds contact emails through a cascade of social pages and Czech registries (ARES, firmy.cz, Hunter.io), and generates personalized outreach messages in two LLM passes.'
+lead: 'Find local businesses that still have no website, enrich their contacts without a domain, and draft a native-sounding pitch tailored to their category, neighbourhood and channel — all inside a local Electron + SQLite desktop tool.'
+stack: ['Electron', 'React', 'TypeScript', 'Playwright', 'SQLite', 'Gemini']
+stackShort: 'Electron · Playwright · AI'
+role: 'Solo — design, scraper, outreach'
+status: 'Private build'
+facts:
+  - label: 'Role'
+    value: 'Solo: design, scraper, app'
+  - label: 'Runtime'
+    value: 'Electron, Playwright, SQLite'
+  - label: 'Enrichment'
+    value: 'Socials, ARES, firmy.cz, Hunter'
+  - label: 'Outreach'
+    value: '2-pass LLM pitch (Gemini / z.ai)'
+screenshot:
+  src: '/images/google-map-scraper.png'
+  width: 1024
+  height: 572
+screenshotCaption: 'The desktop app — configure stealth scraping, the Czech email cascade, and two-pass LLM outreach.'
+order: 3
+hasCaseStudy: true
+---
+
+<Columns>
+
+## Why
+
+Local cafés, salons and studios in Prague often live on a Google Maps pin and an Instagram page, with no website of their own. Finding them by hand — checking whether the Maps link is a real domain or just a Facebook profile, hunting for an email when there is no domain to query, and writing a tailored pitch in Czech — was repetitive enough to deserve a dedicated desktop tool.
+
+## What it does
+
+- Scrapes Google Maps with Playwright (`playwright-extra` + stealth), classifying the authority link so businesses with only Facebook/Instagram still count as "no website" while keeping their social URL
+- Runs a free-first email cascade for domainless leads: Facebook/Instagram bio and `/about` pages (0.9) → Czech ARES business register API (0.8) → `firmy.cz` directory (0.7) → opt-in Hunter.io fallback (0.4)
+- Inspects social profiles in a headless browser to confirm whether the bio hides a real website or only a booking/link-in-bio service, while opening the profile in the system browser
+- Generates personalized outreach messages via a two-pass LLM pipeline (Google Gemini or z.ai): pass 1 drafts the offer from the business's name, category, city and target channel (`instagram_dm`, `facebook_dm`, `email`); pass 2 runs a strict native-speaker proofreader that fixes grammar, morphology and diacritics without changing tone or length
+- Manages leads across jobs in a local `better-sqlite3` database with a TanStack Table view, bulk actions, a `New → Contacted → Won / Lost` kanban pipeline, and CSV export
+
+</Columns>
+
+## How it's built
+
+<FlowDiagram
+  nodes={[
+    { title: 'Google Maps', caption: 'Playwright + stealth' },
+    { title: 'Email cascade', caption: 'FB/IG · ARES · firmy.cz', tone: 'highlight' },
+    { title: 'AI outreach', caption: '2-pass LLM draft + proofread', tone: 'accent' },
+    { title: 'SQLite CRM', caption: 'Table + kanban pipeline', tone: 'plain' },
+  ]}
+  targets={['Instagram DM', 'Facebook DM', 'Email']}
+  footer={[
+    'Electron + electron-vite',
+    'React 19 · TanStack Table & Query · Zustand',
+    'Zod-validated contextBridge IPC',
+    'Gemini & z.ai LLM adapters',
+  ]}
+/>
+
+The app is split across Electron's three processes (`main`, `preload`, `renderer`) with a strict boundary: all Playwright browsers, HTTP calls, `better-sqlite3` repositories, raw SQL migrations and LLM requests live in `main`. The React 19 + shadcn/ui renderer talks to `main` exclusively through a typed `contextBridge` API (`contextIsolation: true`, `nodeIntegration: false`) with Zod validation at the IPC boundary and streaming progress events for long-running scrape and bulk-email jobs.
+
+## What I learned
+
+Standard email finders start from a domain. When the whole point is finding businesses without a website, there is no domain to feed them. Treating a social link on Google Maps as both a "no website" signal and the first hop of the email cascade — followed by Czech public registries (ARES and `firmy.cz`) — finds contacts before touching paid API credits.
+
+A single LLM prompt in a heavily inflected language like Czech either reads like a translation or rewrites the offer when asked to "make it natural". Splitting message generation into a template-driven draft pass (`{{name}}`, `{{category}}`, `{{city}}`, `{{channel}}`) and a constrained native-speaker proofreader pass — allowed to fix only case agreement, verb aspect, prepositions and diacritics — keeps the pitch intact while reading like a native wrote it.
