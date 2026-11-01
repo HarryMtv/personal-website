@@ -36,7 +36,7 @@ export function Screenshot({ src, width, height, caption }: ScreenshotProps) {
           aria-label="Open full-size screenshot"
           aria-haspopup="dialog"
           onClick={() => setOpen(true)}
-          className="block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="focus-visible:outline-accent block w-full cursor-zoom-in rounded-[8px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           {open ? (
             // The zoomed image lives in the lightbox now; an equally tall

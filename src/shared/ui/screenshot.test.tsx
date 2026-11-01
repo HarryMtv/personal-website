@@ -19,8 +19,17 @@ beforeAll(() => {
   // It also lays out nothing — every rect is 0×0 — and motion's shared-layout
   // projection never completes a handoff exit in that degenerate case, so the
   // lightbox would never unmount. Give every element a fixed measurable box.
-  Element.prototype.getBoundingClientRect = () =>
-    ({ x: 0, y: 0, top: 0, left: 0, right: 100, bottom: 56, width: 100, height: 56, toJSON: () => ({}) });
+  Element.prototype.getBoundingClientRect = () => ({
+    x: 0,
+    y: 0,
+    top: 0,
+    left: 0,
+    right: 100,
+    bottom: 56,
+    width: 100,
+    height: 56,
+    toJSON: () => ({}),
+  });
 });
 
 // The app mounts components inside LazyMotion/MotionConfig (see app-providers);
@@ -152,7 +161,10 @@ describe('Screenshot', () => {
     const user = userEvent.setup();
     // innerWidth defaults to 1024 in happy-dom; a narrower clientWidth fakes
     // a classic scrollbar the lock has to compensate for on the body.
-    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, value: 984 });
+    Object.defineProperty(document.documentElement, 'clientWidth', {
+      configurable: true,
+      value: 984,
+    });
     try {
       mount(<Screenshot src="/shot.png" width={1024} height={572} />);
       await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
@@ -193,5 +205,57 @@ describe('Screenshot', () => {
     const spacer = trigger.querySelector('span');
     expect(spacer).toHaveAttribute('aria-hidden', 'true');
     expect(spacer?.style.aspectRatio).toBe('1024 / 572');
+  });
+
+  it('opens the lightbox with the Space key', async () => {
+    const user = userEvent.setup();
+    mount(<Screenshot src="/shot.png" width={1024} height={572} caption="The mini app" />);
+    screen.getByRole('button', { name: 'Open full-size screenshot' }).focus();
+    await user.keyboard(' ');
+    expect(screen.getByRole('dialog', { name: 'The mini app' })).toBeInTheDocument();
+  });
+
+  it('closes the lightbox when clicking the zoomed image', async () => {
+    const user = userEvent.setup();
+    mount(<Screenshot src="/shot.png" width={1024} height={572} caption="The mini app" />);
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    const dialog = screen.getByRole('dialog', { name: 'The mini app' });
+    const zoomedImage = dialog.querySelector('img');
+    expect(zoomedImage).not.toBeNull();
+    await user.click(zoomedImage!);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('preserves pre-existing inline overflow and paddingRight when there is no scrollbar', async () => {
+    const user = userEvent.setup();
+    document.documentElement.style.overflow = 'clip';
+    document.body.style.paddingRight = '12px';
+    Object.defineProperty(document.documentElement, 'clientWidth', {
+      configurable: true,
+      value: window.innerWidth,
+    });
+    try {
+      mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+      await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+      expect(document.documentElement.style.overflow).toBe('hidden');
+      expect(document.body.style.paddingRight).toBe('12px');
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(document.documentElement.style.overflow).toBe('clip');
+      expect(document.body.style.paddingRight).toBe('12px');
+    } finally {
+      document.documentElement.style.overflow = '';
+      document.body.style.paddingRight = '';
+      Reflect.deleteProperty(document.documentElement, 'clientWidth');
+    }
+  });
+
+  it('restores scroll lock if Screenshot unmounts while the lightbox is open', async () => {
+    const user = userEvent.setup();
+    const { unmount } = mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    expect(document.documentElement.style.overflow).toBe('hidden');
+    unmount();
+    expect(document.documentElement.style.overflow).toBe('');
   });
 });

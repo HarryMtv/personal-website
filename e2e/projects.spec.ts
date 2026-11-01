@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('filters update the URL and the rows', async ({ page }) => {
@@ -172,4 +173,106 @@ test('the backdrop click closes the lightbox', async ({ page }) => {
   const box = (await dialog.boundingBox())!;
   await page.mouse.click(box.x + box.width - 16, box.y + box.height - 16);
   await expect(dialog).toBeHidden();
+});
+
+// TODO(QA): Open issue — on mobile, the lightbox caption (`text-paper/80` over
+// `bg-ink/70` atop `bg-card` #ffffff) has a 4.45:1 contrast ratio (< 4.5:1 WCAG AA
+// minimum for 12px text), causing axe to report a serious color-contrast violation.
+test.skip('axe reports no serious or critical violations when the screenshot lightbox is open', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/projects?selected=google-map-scraper');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
+  await page.getByRole('button', { name: 'Open full-size screenshot' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+  const results = await new AxeBuilder({ page }).analyze();
+  const serious = results.violations.filter((violation) =>
+    ['serious', 'critical'].includes(violation.impact ?? ''),
+  );
+  expect(serious).toEqual([]);
+});
+
+// TODO(QA): Open issue — opening the lightbox resets the ancestor m.article[data-window]
+// drag transform to `none`, snapping a dragged desktop window back to center.
+test.skip('opening and closing the lightbox on a dragged desktop window keeps the dragged position', async ({
+  page,
+}) => {
+  test.skip((page.viewportSize()?.width ?? 1440) < 900, 'desktop viewport only');
+  await page.goto('/projects?selected=google-map-scraper');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  const titleBar = page.locator('[data-window] > div').first();
+  const titleBox = (await titleBar.boundingBox())!;
+  await page.mouse.move(titleBox.x + 200, titleBox.y + 15);
+  await page.mouse.down();
+  await page.mouse.move(titleBox.x + 80, titleBox.y + 120, { steps: 10 });
+  await page.mouse.up();
+
+  const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
+  const draggedThumb = (await trigger.boundingBox())!;
+
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+
+  const afterThumb = (await trigger.boundingBox())!;
+  expect(Math.abs(afterThumb.x - draggedThumb.x)).toBeLessThan(2);
+  expect(Math.abs(afterThumb.y - draggedThumb.y)).toBeLessThan(2);
+});
+
+// TODO(QA): Open issue — on close, Screenshot immediately mounts the thumbnail
+// m.img inside its `overflow-hidden` mat behind the z-50 backdrop while Motion
+// sets `visibility: hidden` on the lightbox m.img, leaving a blank cream figure
+// in the lightbox and clipping the shrinking image inside the thumbnail box.
+test.skip('closing the lightbox animates the image back without clipping it or showing a blank mat', async ({
+  page,
+}) => {
+  test.skip((page.viewportSize()?.width ?? 1440) < 900, 'desktop viewport only');
+  await page.goto('/projects?selected=google-map-scraper');
+  await expect(page.getByRole('complementary', { name: 'Preview' })).toBeVisible();
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animation) => animation.playState !== 'running'),
+  );
+
+  const trigger = page.getByRole('button', { name: 'Open full-size screenshot' });
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await page.waitForTimeout(350);
+
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(40);
+
+  // Mid-close, the visible animating image must not be clipped by an ancestor
+  // `overflow: hidden` smaller than the image's own animated bounding box.
+  const midCloseState = await page.evaluate(() => {
+    const dialogImg = document.querySelector<HTMLImageElement>('[role="dialog"] img');
+    const thumbImg = document.querySelector<HTMLImageElement>('figure button img');
+    const activeImg =
+      dialogImg && getComputedStyle(dialogImg).visibility !== 'hidden' ? dialogImg : thumbImg;
+    if (!activeImg) return { clipped: true };
+    const imgRect = activeImg.getBoundingClientRect();
+    let el: HTMLElement | null = activeImg.parentElement;
+    while (el && el !== document.body) {
+      const style = getComputedStyle(el);
+      if (style.overflow === 'hidden' || style.overflow === 'clip') {
+        const parentRect = el.getBoundingClientRect();
+        if (parentRect.left > imgRect.left + 4 || parentRect.bottom < imgRect.bottom - 4) {
+          return { clipped: true };
+        }
+      }
+      el = el.parentElement;
+    }
+    return { clipped: false };
+  });
+  expect(midCloseState.clipped).toBe(false);
 });
