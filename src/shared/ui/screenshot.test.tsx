@@ -260,4 +260,60 @@ describe('Screenshot', () => {
     unmount();
     expect(document.documentElement.style.overflow).toBe('');
   });
+
+  it('uses the caption for the zoomed image alt text and falls back to Screenshot', async () => {
+    const user = userEvent.setup();
+    const { unmount } = mount(
+      <Screenshot src="/shot.png" width={1024} height={572} caption="The mini app" />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    expect(screen.getByRole('dialog').querySelector('img')).toHaveAttribute('alt', 'The mini app');
+    unmount();
+
+    mount(<Screenshot src="/shot.png" width={1024} height={572} />);
+    await user.click(screen.getByRole('button', { name: 'Open full-size screenshot' }));
+    expect(screen.getByRole('dialog').querySelector('img')).toHaveAttribute('alt', 'Screenshot');
+  });
+
+  it('treats a second Escape during the closing animation as a guarded no-op without closing the window', async () => {
+    const onWindowClose = vi.fn();
+    function WindowStub() {
+      useEscapeToClose(onWindowClose);
+      return <Screenshot src="/shot.png" width={1024} height={572} />;
+    }
+    const user = userEvent.setup();
+    render(
+      <LazyMotion features={domMax} strict>
+        <MotionConfig reducedMotion="never">
+          <WindowStub />
+        </MotionConfig>
+      </LazyMotion>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Open full-size screenshot' });
+    // Give the trigger a smaller rect than the lightbox mat so `flipFrom` has a
+    // non-zero delta and the 300ms closing zoom stays in flight.
+    vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue({
+      x: 10,
+      y: 10,
+      top: 10,
+      left: 10,
+      right: 60,
+      bottom: 38,
+      width: 50,
+      height: 28,
+      toJSON: () => ({}),
+    });
+    await user.click(trigger);
+    const focusSpy = vi.spyOn(trigger, 'focus');
+
+    await user.keyboard('{Escape}');
+    // The dialog is still mounted while the 300ms closing zoom runs; a second
+    // Escape must be swallowed by the lightbox and not restart the close.
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    expect(onWindowClose).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(focusSpy).toHaveBeenCalledTimes(1);
+  });
 });
