@@ -8,7 +8,7 @@ lead: 'The model is the last step. Sources are embedded, clustered and retrieved
 stack: ['TypeScript', 'pgvector', 'pg-boss', 'DeepSeek', 'Cohere', 'PostgreSQL']
 stackShort: 'RAG · pgvector · DeepSeek'
 role: 'Solo — design, pipeline, bot'
-status: 'Private build'
+status: 'Open source'
 facts:
   - label: 'Role'
     value: 'Solo: design, pipeline, bot'
@@ -117,3 +117,5 @@ Instead of adding Redis as a second stateful dependency, the system runs its job
 Retrieval has to happen before a sentence exists. If the draft is not tied to a retrieved story and a FactSheet, the fact-check has nothing to compare against, and "grounded" is just a prompt instruction. Cross-lingual embeddings were the dedup: the same paper in English and a Russian write-up is one story, or the channel posts it twice.
 
 The cheap model does the volume — triage, FactSheets, first drafts. The thinking model is reserved for "rewrite better" and the agent loops. A monthly cap makes that split a product rule, not a hope. Rejection reasons are part of the loop too: a no can lower a source's trust, change score weights, or extend the blacklist, instead of vanishing into chat history.
+
+The code and architecture are on [GitHub](https://github.com/HarryMtv/telegram-content-engine).
