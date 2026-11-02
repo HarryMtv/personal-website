@@ -5,7 +5,7 @@ kindLabel: 'Side project'
 tags: ['typescript', 'telegram', 'ai']
 summary: 'Telegram bot + mini app that brings ClickUp, Wrike and Jira tasks into your chats through one adapters layer.'
 lead: 'Your task tracker, inside Telegram. One bot and mini app for ClickUp, Wrike and Jira — subscribe to a task, read it, comment on it, without opening another tab.'
-stack: ['TypeScript', 'Fastify', 'Supabase', 'Docker', 'shadcn']
+stack: ['TypeScript', 'Fastify', 'Supabase', 'BullMQ', 'Redis', 'Docker', 'shadcn']
 stackShort: 'TS · Fastify · Supabase'
 role: 'Solo — design, code, deploy'
 # TODO(content): confirm the project status.
@@ -60,10 +60,57 @@ ClickUp users had been asking for a Telegram integration for years, and the feat
   targets={['ClickUp', 'Wrike', 'Jira']}
   footer={[
     'Supabase — subscriptions & users',
+    'BullMQ + Redis — webhook queue',
     'Docker + Coolify on VPS',
     'shadcn + Tailwind mini app',
   ]}
 />
+
+The runtime is two processes built from one Docker image: `server.ts` (Fastify 5 — webhook endpoint, grammY bot, Mini App API and its static build) and `worker.ts` (a BullMQ consumer). They share no memory; they talk only through Redis. The core — endpoint, worker, notifier, bot, Mini App — knows only the unified models in `src/models/unified.ts` and never branches on a provider name. Everything provider-specific (credential shape, webhook lifecycle, payload parsing, status mapping, rate limits) sits behind one `ProviderAdapter` interface, and the core reads behaviour from `capabilities()` — `payload: 'rich' | 'minimal'`, `webhookSetup: 'auto' | 'admin-required'` — not from the provider id. A new tracker means one adapter directory plus one `registry.register(...)` call.
+
+## Webhooks, the queue and Redis
+
+```text
+POST /webhooks/:provider            (Fastify)
+  → handshake short-circuit (Wrike)  → reply, no job
+  → find webhook by id → decrypt secret → HMAC over raw bytes
+  → queue.add('webhook', { provider, connectionId, payload, headers })
+  → 200 OK                           (fast-ACK)
+        │  Redis (BullMQ)
+        ▼
+worker processJob                    (concurrency 8)
+  → adapter.parseEvents()            → UnifiedEvent[]
+  → adapter.enrichEvent()            only for 'minimal' payloads
+  → fan-out per subscription: event type → container → "assigned to me"
+       → self-echo check → idempotent insert → Telegram send
+```
+
+- **Fast-ACK.** The endpoint does only what has to happen in the request: verify the signature, enqueue, return 200. Provider API calls and database fan-out run in the worker, so a slow tracker API can't make ClickUp or Wrike time out and switch the webhook off.
+- **Redis is the only link between the processes.** BullMQ gets a plain `host/port/db/password` object parsed from `REDIS_URL`, because it bundles its own ioredis. A separate ioredis connection exists only for `/health`: a `PING` raced against a 1.5 s timeout, so a dead Redis turns the probe red instead of hanging it.
+- **Retries and the DLQ.** Each job has `attempts: 5` with exponential backoff starting at 2 s. Jobs that run out of retries stay in BullMQ's `failed` set for 7 days (capped at 10,000), which works as the dead-letter queue. Completed jobs are kept for 24 hours.
+- **What lands in Redis.** The job holds the verified raw payload, the flattened headers and a `connectionId`. It never holds credentials: the worker loads the connection from Supabase and decrypts the token in memory when it processes the job.
+- **Durability.** In compose, Redis 7 runs with `--appendonly yes` on a named volume, and `app` and `worker` start only after `redis-cli ping` passes. Workers scale with `docker compose up -d --scale worker=N`.
+- **Idempotency lives in Postgres, not Redis.** Every adapter builds a stable `dedupeKey`: ClickUp `event:history_item.id`, Wrike `eventType:taskId:lastUpdatedDate` (plus the status pair), Jira the `X-Atlassian-Webhook-Identifier` delivery id plus the changelog index, with a sha256 fallback. The worker inserts into `notification_log` with `unique(subscription_id, dedupe_key)` and `ignoreDuplicates`. A BullMQ retry or a provider re-delivery therefore can't send the same message twice.
+- **Rate limits.** The rate limiters are token buckets. Per connection, a bucket holds each tracker to its rpm (shared through `AsyncLocalStorage` so adapter signatures stay clean), and the HTTP client honours `Retry-After` on 429. On the way out there is a global 30 msg/s bucket for the Telegram Bot API, plus a per-chat bucket: 1 msg/s for private chats and 20 msg/min for groups (negative chat ids).
+
+## Security
+
+- **Credentials at rest.** Provider tokens and webhook secrets are encrypted at the application boundary with AES-256-GCM: a fresh 96-bit IV per record, stored as `iv:tag:ciphertext`. The auth tag makes any tampered row fail to decrypt. `ENCRYPTION_KEY` must be exactly 64 hex characters (checked by Zod at boot) and never leaves the app.
+- **Webhook authenticity.** Fastify's JSON parser keeps the original bytes on `req.rawBody` before parsing, and the HMAC-SHA256 is checked against those bytes, never against re-serialised JSON. Comparison is constant-time (`timingSafeEqual`). Each adapter knows its own scheme: ClickUp `X-Signature`, Wrike `X-Hook-Signature` plus the `X-Hook-Secret` handshake, Jira `X-Hub-Signature: sha256=…`. The webhook id in the payload is used only to look up the secret; it doesn't prove anything on its own.
+- **Telegram.** In webhook mode the bot is registered with a `secret_token`, and `/api/telegram` rejects any update without the matching `X-Telegram-Bot-Api-Secret-Token`.
+- **Mini App auth.** `initData` is verified as Telegram specifies — `secret = HMAC("WebAppData", BOT_TOKEN)`, then an HMAC over the sorted `data_check_string` — and rejected if older than one hour. The backend then issues a short-lived HS256 JWT with a `telegram_id` claim.
+- **Tenant isolation.** Postgres RLS is on for every table, and the policies are keyed on `auth.jwt() ->> 'telegram_id'`. `webhooks` and `notification_log` have no policy, so the Mini App role can't read them at all. The backend uses the service-role key and bypasses RLS, so every repository in `src/db/` is scoped by `user_id` or `connection_id` in code. Disconnect checks ownership before deleting anything.
+- **Tokens in chat.** `/connect <provider> <token>` deletes the message before validating or making any network call, so a failed connect doesn't leave the token in the chat history. Multi-field credentials (Jira) go only through the Mini App form.
+- **Runtime.** The image runs as a non-root user. All config comes from a Zod schema that fails fast, there are no stray `process.env` reads, and decrypted credentials are never logged.
+
+## AI workflow: spec, context and retrieval
+
+The bot itself never calls an LLM. The AI part is how it was built, and the repo is laid out so an agent can keep working on it on a ~\$20 subscription without reading the whole codebase every session.
+
+- **The spec as ground truth.** OpenSpec (`schema: spec-driven`) keeps one spec per capability — `webhook-processing`, `provider-adapters`, `notification-delivery`, `telegram-bot`, `data-model`, `deployment` and the Mini App screens. Each change goes `propose → apply → archive` with its own `proposal.md`, `design.md` and `tasks.md`. The code cites the spec as `spec §N`, so the model can trace a function back to the requirement behind it.
+- **Context the model loads every session.** `AGENTS.md` (with a condensed `CLAUDE.md` copy) holds the rules that can't be guessed from the code: the "no provider branches in the core" rule, the raw-body, fast-ACK and idempotency invariants, and the security rules ("service role bypasses RLS — scope every query by `user_id`"). Skills live once in `.agents/skills` and are linked into each agent's own folder. The shadcn MCP server handles UI components.
+- **RAG over the codebase.** graphify builds a knowledge graph of the repo — AST nodes, cross-file relations, communities and "god nodes" — into `graphify-out/graph.json`. Instead of grepping whole files into context, the agent retrieves a scoped subgraph with `graphify query "<question>"`, `graphify path A B` or `graphify explain <concept>` and generates from that. It's retrieval-augmented generation, but the index is a graph instead of vectors. Claude Code `PreToolUse` hooks on `grep`/`rg`/`find` and on `Read`/`Glob` inject a reminder to query the graph first. After edits, `graphify update .` refreshes it from the AST at no API cost. The output is gitignored and can be rebuilt any time.
+- **Guardrails for generated code.** `conformance.test.ts` drives the contract through a `FakeAdapter` using the real HMAC path. Each adapter has its own tests for parsing, `dedupeKey` and status categories, and the worker's fan-out takes swappable `FanOutDeps`. The suite needs no credentials, Redis or database, so an agent's definition of done is just `pnpm test && pnpm typecheck && pnpm lint`.
 
 ## What I learned
 

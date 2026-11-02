@@ -5,7 +5,7 @@ kindLabel: 'Side project'
 tags: ['typescript', 'telegram', 'ai']
 summary: 'A retrieval-augmented editorial pipeline for a Telegram channel. Cohere embeddings and pgvector cluster tech sources across English and Russian; DeepSeek drafts only from the retrieved story, then a fact-check compares the post to the source text. Nothing publishes until I approve it.'
 lead: 'The model is the last step. Sources are embedded, clustered and retrieved first — then DeepSeek writes a Telegram post from that story, and a separate pass checks the draft against the original text.'
-stack: ['TypeScript', 'pgvector', 'DeepSeek', 'Cohere', 'PostgreSQL']
+stack: ['TypeScript', 'pgvector', 'pg-boss', 'DeepSeek', 'Cohere', 'PostgreSQL']
 stackShort: 'RAG · pgvector · DeepSeek'
 role: 'Solo — design, pipeline, bot'
 status: 'Private build'
@@ -54,13 +54,63 @@ A channel that reposts whatever an LLM just read will double-publish the same st
   targets={['Publish', 'Rewrite', 'Reject']}
   footer={[
     'Resolver · Scout · Analyst',
+    'pg-boss v10 queue over Postgres',
     'Cheap model for triage, thinking model for rewrites',
     'Shadow mode before any autopublish',
     'Monthly token budget with a hard cap',
   ]}
 />
 
-Five processes share one Postgres: an API and the editorial bot, a light worker for the funnel, a scheduler, a GramJS worker for read-only channel metrics, and a sandbox for the agents. Resolver looks up the primary source behind a Telegram lead. Scout hunts trends the sources are missing. Analyst reads rejections and engagement and proposes changes to the channel constitution. Autopublish stays off until a shadow mode agrees with me, and a kill switch drops the queue.
+Five processes are built from a single Docker image and share one PostgreSQL 16 database: `api` (Fastify + grammY editorial bot and `/ingest` endpoint), `worker-light` (the ingestion, embedding, clustering and drafting pipeline), `scheduler` (minute-level polling ticks and daily batch crons), `worker-mtproto` (a singleton read-only GramJS client for channel scraping and engagement snapshots at `+1h`/`+6h`/`+24h`/`+72h`), and `worker-agents` (the autonomous agent runtime). They share no in-memory state and coordinate exclusively through Postgres and `pg-boss`.
+
+## Vector store, cross-lingual dedup and RAG
+
+```text
+discover() → canonicalize URL → url_hash / content_hash dedup → Stage 0 filters
+     │
+     ▼
+fetch() full text → Cohere embed-multilingual-v3.0 (1024d)
+     │
+     ▼
+pgvector HNSW search (14-day window, cosine similarity ≥ 0.82)
+  ├─ match → merge into Story, update L2-normalized running centroid & velocity
+  └─ no match → create new Story
+     │
+     ▼
+Stage 1 numeric score → Stage 2 LLM triage → MMR diversification
+     │
+     ▼
+generateFactSheet() → verifyFactSheet() (temp 0.0) → generateLlmDraft()
+```
+
+- **Three-layer deduplication.** Before touching any embedding API, items pass through two deterministic identity layers: `url_hash` (SHA-256 of the canonicalized URL with `utm_*`/`fbclid`/`gclid` stripped, AMP paths normalized and shortlinks resolved via bounded `HEAD` hops) and `content_hash` (SHA-256 of the extracted body text), both enforced by partial `UNIQUE` indexes in Postgres (`ON CONFLICT DO NOTHING`).
+- **Multilingual embeddings & HNSW index.** Surviving items are formatted as `title + 1500-char body snippet` and embedded in batches with Cohere `embed-multilingual-v3.0` (`input_type: "search_document"`, `vector(1024)`). Both `items.embedding` and `stories.centroid` are indexed with `pgvector` HNSW (`USING hnsw (... vector_cosine_ops)`). A weekly cleanup job (`cleanupOldEmbeddings`) nulls out vectors older than 90 days so the HNSW index stays compact while preserving URL and content hashes forever.
+- **Incremental story clustering.** When an item is embedded, `clusterItemIntoStory` queries `stories` within a 14-day window ordered by `centroid <=> vec ASC LIMIT 1`. If cosine similarity (`1 - (centroid <=> vec)`) is `>= 0.82`, the item merges into that `Story` — collapsing an English ArXiv paper, a Hacker News thread and a Russian Telegram write-up into a single event. The story's centroid is updated in place via a running mean followed by L2 normalization, and `source_diversity`, `velocity` (`items / hour`) and `peak_external_signal` are recalculated. An offline simulator (`reclusterStoriesOffline`) replays historical embeddings with `dryRun: true` to calibrate the `0.82` threshold.
+- **4-stage funnel and MMR diversification.** Stage 0 runs zero-cost hard filters (language, age cutoff, domain blacklist, regex spam patterns, and checking that the `story_id` was never published to the channel). Stage 1 scores candidates purely in math (`0.35 * relevance + 0.25 * importance + 0.20 * freshness + 0.20 * trust`), where `relevance` is cosine similarity to the channel's `profile_vector` (the L2-normalized centroid of the last 50 published stories, falling back to an embedding of the channel manifesto on cold start), `freshness` decays exponentially (`0.5 ^ (ageHours / halfLifeHours)`), and unmarked leads without a primary source take a `0.7` multiplier penalty. Stage 2 sends the top 8 candidates to the cheap LLM in a single batch (`temperature: 0.1`, Zod-validated JSON) to score `relevance` and `novelty` against the channel's `selection_rules`. Stage 3 applies **Maximal Marginal Relevance (MMR)**: it greedily picks up to `dailyCap` stories by subtracting a diversity penalty (`0.25 * max(cosineSimilarity(cand, selected))`) so near-duplicate topics don't crowd the daily batch.
+- **Grounded RAG: FactSheet → FactCheck → Draft.** The drafter never sees raw unverified web pages directly. First, `generateFactSheet` extracts a structured JSON `FactSheet` (`what_happened`, `who`, `numbers`, `key_quote`, `why_it_matters`, `primary_url`, `source_item_ids`) from the story's retrieved source texts at `temperature: 0.1`. Second, `verifyFactSheet` runs an independent fact-check pass at `temperature: 0.0`, comparing every number, quote and entity in the `FactSheet` against the raw source bodies; if `passed: false`, confidence is capped at `0.6` and discrepancies are recorded. Only then does `generateLlmDraft` synthesize the Russian Telegram post from the verified `FactSheet`, enforcing the channel's `style_guide`, `taboos`, `target_length` and mandatory `primary_url` attribution.
+
+## AI architecture: two-tier LLM, agents and feedback loop
+
+- **Two-tier model routing.** `LlmClient` routes calls by role: `cheap` (`deepseek-v4-flash`) handles high-volume Stage 2 triage, FactSheet extraction, fact-checking and first drafts; `strong` (`deepseek-v4-pro` with `thinking: { type: "enabled" }` and `reasoning_effort: "high"`) is reserved for the editor's **⚡ Rewrite Better** button and multi-step autonomous agents.
+- **Framework-free agent runtime.** `runAgent` in `src/agents/runtime.ts` is a zero-dependency loop (`while (steps < maxSteps)`) with hard per-run ceilings on steps (`maxSteps: 5–8`), wall-clock time (`30–60 s`) and dollar cost (`$0.50`), keyed by `idempotency_key` in `agent_runs`. Tools are plain TypeScript functions with Zod input schemas; the model replies with `TOOL: <name>\nARGS: <json>` or `FINAL_ANSWER: <json>`, and if Zod validation fails on the final answer, the validation error is fed back into the conversation for self-correction.
+  - **Resolver** triggers on forwarded Telegram posts that lack external links, queries Brave/Tavily (`web_search`) and internal `search_sources` to locate the original GitHub repo, ArXiv paper or company blog, and patches `canonical_url` and `fact_sheets.primary_url` (or stamps `no_primary_source` so Stage 1 penalizes the lead).
+  - **Scout** runs daily via cron, reads the channel constitution, searches the web for emerging topics not yet covered in `items`, deduplicates via `check_duplicate`, and injects top finds into the pipeline.
+  - **Analyst** runs weekly, inspects `editorial_decisions`, Levenshtein `edit_distance` on manual edits and post ERR snapshots, and proposes a structured JSON diff (`selectionRulesDiff`, `taboosDiff`, `styleGuideDiff`, `weightsDiff`). The diff is stored in `profile_proposals` and sent to the owner in Telegram with `✅ Accept` / `❌ Reject` inline buttons; accepting atomically creates `channel_profiles` version `v + 1` with a changelog.
+- **7-reason rejection taxonomy.** Rejecting a draft in the bot requires picking one of 7 reasons (`off_topic`, `already_covered`, `boring`, `bad_style`, `unreliable_source`, `too_long`, `wrong_tone`), each mapped to a specific subsystem (`profile_vector`, `cluster_threshold`, `importance_weight`, `style_guide`, `source_trust`, `target_length`) and immediately adjusting `sources.trust_score`.
+
+## Queueing and coordination (pg-boss on Postgres)
+
+Instead of adding Redis as a second stateful dependency, the system runs its job queues and cron schedules on the same PostgreSQL instance via `pg-boss` v10:
+
+- **Transaction-pooler compatibility.** Because `pg-boss` v10 uses SQL polling rather than `LISTEN/NOTIFY`, it works cleanly through Supabase's transaction pooler. `createBoss` configures `pg.Pool` with `max: 2`, TCP `keepAlive` (`10 s` initial delay) and a `30 s` `idleTimeoutMillis` so the pooler doesn't silently drop idle connections between jobs.
+- **Startup deadlock retry with jitter.** When Coolify boots all 5 containers simultaneously, concurrent `createQueue` calls can collide on `pgboss.queue` locks (`40P01` deadlock / `40001` serialization failure). `ensureQueues` wraps queue creation in exponential backoff with random jitter (`200ms * 2^attempt + rand(150ms)`) so all processes converge cleanly.
+- **Singleton keys and idempotency.** Every job is dispatched with a `singletonKey` (`poll-source:<sourceId>`, `fetch-item:<itemId>`, `build-batch:<channelId>`, `send-batch:<channelId>`, `agent:resolver:<itemId>`, `metrics:<postId>:<offset>h`) and `singletonSeconds`, preventing overlapping runs of the same work. Poll jobs use `retryLimit: 0` so a down feed increments `error_count` once per scheduled tick rather than looping retries, transitioning `healthy → degraded → dead` and alerting the owner.
+
+## Security, cost guardrails and operational safety
+
+- **Hard monthly LLM budget cap.** `LlmClient` logs every completion to `llm_calls` with exact token counts, latency and USD cost before returning to the caller. Before Stage 3 runs, `evaluateBudgetGuard` sums `cost_usd` for the current UTC month: at 80% of the `$10/mo` limit it sends the owner a per-stage spend breakdown; at 100% it halts LLM draft generation and falls back to zero-cost template drafts.
+- **Shadow mode, 5-gate autopublish and Kill Switch.** Nothing auto-publishes by default. Shadow mode evaluates every candidate against a `0.65` score threshold and tracks rolling agreement with the human editor's decisions. `checkAutopublishEligibility` requires all 5 gates to pass simultaneously: `>= 85%` rolling agreement sustained for 14 consecutive days (minimum 15 decisions), whitelisted source type, allowed format, UTC publish window (`06:00–20:00`), and daily post cap. If the owner rejects a single autopublished post, `resetAgreementOnAutoPostRejection` resets the 14-day agreement streak to zero. A `/kill_switch` command (`triggerKillSwitch`) immediately expires all `pool`/`queued`/`drafted` candidates and drops the channel back to manual mode.
+- **Auth, contributor sandboxing and atomic claims.** The HTTP `/ingest` endpoint requires a Bearer `INGEST_TOKEN`; Telegram webhooks verify `X-Telegram-Bot-Api-Secret-Token`; bot admin commands check `ctx.from.id === telegramOwnerChatId`. External users messaging the bot are isolated into the `contributor` role with a strict rate limit of 10 submissions/day and a ban flag in `contributors`. Analyst constitution updates are claimed atomically via `UPDATE profile_proposals SET status = ... WHERE id = $1 AND status = 'pending'` to prevent double-apply races on inline button taps.
 
 ## What I learned
 
